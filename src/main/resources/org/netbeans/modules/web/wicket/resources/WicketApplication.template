@@ -1,0 +1,25 @@
+/*
+ * __NAME__.java
+ *
+ * Created on __DATE__, __TIME__
+ */
+ 
+package __NAME_OF_PACKAGE__;           
+
+import org.apache.wicket.protocol.http.WebApplication;
+/** 
+ *
+ * @author __USER__
+ * @version 
+ */
+
+public class __NAME__ extends WebApplication {
+
+    public __NAME__() {
+    }
+
+    public Class getHomePage() {
+        return __NAME_OF_HOME_PAGE__.class;
+    }
+
+}

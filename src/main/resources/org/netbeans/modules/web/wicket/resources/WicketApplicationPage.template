@@ -1,0 +1,17 @@
+/*
+ * __NAME__.java
+ *
+ * Created on __DATE__, __TIME__
+ */
+
+package __NAME_OF_PACKAGE__;           
+
+import org.apache.wicket.markup.html.basic.Label;
+
+public class __NAME__ extends __NAME_OF_IMPORT_CLASS_SHORT__ {
+
+    public __NAME__() {
+        add(new Label("message", "Hello, World!"));
+    }
+
+}

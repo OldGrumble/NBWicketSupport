@@ -1,0 +1,30 @@
+/*
+ * __NAME__.java
+ *
+ * Created on __DATE__, __TIME__
+ */
+ 
+package __NAME_OF_PACKAGE__;           
+
+import java.io.Serializable;
+/** 
+ *
+ * @author __USER__
+ * @version 
+ */
+
+public class __NAME__ implements Serializable {
+
+    private String text;
+
+    public __NAME__() {
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public String getText() {
+        return text;
+    }
+}

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+<filesystem>
+    <folder name="HTMLPalette">
+        <folder name="Wicket">
+            <file name="Label.xml" url="nbresloc:/org/netbeans/modules/web/wicket/palette/label/Label.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="AjaxField.xml" url="nbresloc:/org/netbeans/modules/web/wicket/palette/ajaxfield/AjaxField.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="DropDown.xml" url="nbresloc:/org/netbeans/modules/web/wicket/palette/dropdown/DropDown.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="Editable.xml" url="nbresloc:/org/netbeans/modules/web/wicket/palette/editablefield/Editable.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+        </folder>
+        <attr name="HTML/JSF" boolvalue="true"/>
+        <attr name="HTML_Forms/JSF" boolvalue="true"/>
+    </folder>
+
+    <folder name="Editors">
+        <folder name="AnnotationTypes">
+            <file name="org-netbeans-modules-web-wicket-verification-WicketProblemMark.xml" url="/org/netbeans/modules/web/wicket/verification/WicketProblemMark.xml"/>
+        </folder>
+        <folder name="text">
+            <folder name="html">
+                <folder name="Popup">
+                    <folder name="goto">
+                        <file name="org-netbeans-modules-web-wicket-actions-GotoJavaAction.shadow">
+                            <attr name="originalFile" stringvalue="Actions/Wicket/org-netbeans-modules-web-wicket-actions-GotoJavaAction.instance"/>
+                        </file>
+                    </folder>
+                </folder>
+                <folder name="HyperlinkProviders">
+                    <file name="WicketHTMLHyperlinkProvider.instance">
+                        <attr name="instanceClass" stringvalue="org.netbeans.modules.web.wicket.hyperlink.WicketHTMLHyperlingProvider"/>
+                        <attr name="instanceOf" stringvalue="org.netbeans.lib.editor.hyperlink.spi.HyperlinkProvider"/>
+                    </file>
+                </folder>
+            </folder>
+            <folder name="x-java">
+                <folder name="Popup">
+                    <folder name="goto">
+                        <file name="org-netbeans-modules-web-wicket-actions-GotoHTMLAction.shadow">
+                            <attr name="originalFile" stringvalue="Actions/Wicket/org-netbeans-modules-web-wicket-actions-GotoHTMLAction.instance"/>
+                            <attr name="position" intvalue="100"/>
+                        </file>
+                    </folder>
+                    <attr name="goto-help/org-netbeans-modules-web-wicket-tree-SomeAction.shadow" boolvalue="true"/>
+                    <attr name="goto-help/org-netbeans-modules-web-wicket-tree-separatorBefore.instance" boolvalue="true"/>
+                    <attr name="org-netbeans-modules-web-wicket-tree-SomeAction.shadow/SeparatorAfterGoToHelp.instance" boolvalue="true"/>
+                    <attr name="org-netbeans-modules-web-wicket-tree-SomeAction.shadow/org-netbeans-modules-web-wicket-tree-separatorAfter.instance" boolvalue="true"/>
+                    <attr name="org-netbeans-modules-web-wicket-tree-separatorAfter.instance/SeparatorAfterGoToHelp.instance" boolvalue="true"/>
+                    <attr name="org-netbeans-modules-web-wicket-tree-separatorBefore.instance/org-netbeans-modules-web-wicket-tree-SomeAction.shadow" boolvalue="true"/>
+                    <file name="org-netbeans-modules-web-wicket-tree-separatorAfter.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                    </file>
+                    <file name="org-netbeans-modules-web-wicket-tree-separatorBefore.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                    </file>
+                </folder>
+                <folder name="CodeTemplates">
+                    <folder name="Defaults">
+                        <file name="WicketCodeTemplates.xml" url="codeTemplates.xml">
+                            <attr name="position" intvalue="100"/>
+                        </file>
+                    </folder>
+                </folder>
+            </folder>
+        </folder>
+        <!--        <folder name="Hints">
+            <file name="org-netbeans-modules-web-wicket-verification-WicketHintsProvider.instance">
+                <attr name="instanceClass" stringvalue="org.netbeans.modules.web.wicket.verification.WicketHintsProvider"/>
+                <attr name="instanceOf" stringvalue="org.netbeans.modules.editor.hints.spi.HintsProvider"/>
+                <attr name="instanceCreate" methodvalue="org.netbeans.modules.web.wicket.verification.WicketHintsProvider.getInstance"/>
+            </file>
+        </folder>-->
+    </folder>
+
+    <folder name="Loaders">
+        <folder name="text">
+            <folder name="x-java">
+                <folder name="Actions">
+                    <attr name="PasteAction.instance/org-netbeans-modules-web-wicket-tree-SomeAction.shadow" boolvalue="true"/>
+                    <attr name="PasteAction.instance/org-netbeans-modules-web-wicket-tree-separatorBefore.instance" boolvalue="true"/>
+                    <attr name="org-netbeans-modules-web-wicket-tree-SomeAction.shadow/CompileFile.instance" boolvalue="true"/>
+                    <attr name="org-netbeans-modules-web-wicket-tree-SomeAction.shadow/org-netbeans-modules-web-wicket-tree-separatorAfter.instance" boolvalue="true"/>
+                    <attr name="org-netbeans-modules-web-wicket-tree-separatorAfter.instance/CompileFile.instance" boolvalue="true"/>
+                    <attr name="org-netbeans-modules-web-wicket-tree-separatorBefore.instance/org-netbeans-modules-web-wicket-tree-SomeAction.shadow" boolvalue="true"/>
+                    <file name="org-netbeans-modules-web-wicket-tree-separatorAfter.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                    </file>
+                    <file name="org-netbeans-modules-web-wicket-tree-separatorBefore.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                    </file>
+                </folder>
+            </folder>
+        </folder>
+    </folder>
+    <folder name="Services">
+        <folder name="JavaHelp">
+            <file name="wicket-helpset.xml" url="wicket-helpset.xml"/>
+        </folder>
+    </folder>
+    <folder name="org-netbeans-modules-web-wicket">
+        <file name="WicketBorderPage.template" url="WicketBorderPage.template"/>
+        <file name="WicketBorderPage.html" url="WicketBorderPage.html"/>
+    </folder>
+
+    <folder name="j2ee">
+        <folder name="webtier">
+            <folder name="framework">
+                <file name="org-netbeans-modules-web-wicket-framework-WicketFrameworkProvider.instance"/>
+            </folder>
+        </folder>
+    </folder>
+
+    <folder name="org-netbeans-modules-web-wicket-template">
+        <file name="WicketApplication.template" url="WicketApplication.template"/>
+        <file name="WicketApplicationPage.template" url="WicketApplicationPage.template"/>
+        <file name="WicketApplicationPage.html" url="WicketApplicationPage.html"/>
+        <file name="WicketExamplePage.html" url="WicketExamplePage.html"/>
+        <file name="style.css" url="style.css"/>
+        <file name="wicket-logo.png" url="wicket-logo.png"/>
+        <file name="WicketPojo.template" url="WicketPojo.template"/>
+        <file name="WicketExampleApplication.template" url="WicketExampleApplication.template"/>
+        <file name="WicketExampleHeader.html" url="WicketExampleHeader.html"/>
+        <file name="WicketExampleFooter.html" url="WicketExampleFooter.html"/>
+        <file name="WicketExamplePage.template" url="WicketExamplePage.template"/>
+        <file name="WicketExampleHeader.template" url="WicketExampleHeader.template"/>
+        <file name="WicketExampleFooter.template" url="WicketExampleFooter.template"/>
+    </folder>
+
+    <folder name="Templates">
+        <attr name="displayName" bundlevalue="org.netbeans.modules.web.wicket.template.filelevel.Bundle#Templates"/>
+        <folder name="Project">
+            <folder name="Samples">
+                <folder name="Wicket">
+                    <attr name="position" intvalue="50"/>
+                </folder>
+            </folder>
+        </folder>
+    </folder>
+</filesystem>
