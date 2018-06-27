@@ -39,6 +39,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import org.netbeans.modules.web.wicket.tree.HtmlTreeBuilder;
 import org.netbeans.modules.web.wicket.tree.MarkupContainerTree;
+import org.netbeans.modules.web.wicket.tree.Node;
 import org.netbeans.modules.web.wicket.util.WicketSupportConstants;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.openide.cookies.EditorCookie;
@@ -148,12 +149,12 @@ public class WicketTagNavigator implements NavigatorPanel, LookupListener {
         }
     }
 
-    private void addNodes(DefaultMutableTreeNode node, MarkupContainerTree.Node<String> child) {
+    private void addNodes(DefaultMutableTreeNode node, Node<String> child) {
         DefaultMutableTreeNode nd = new DefaultMutableTreeNode(child);
         node.add(nd);
-        List<MarkupContainerTree.Node<String>> l = child.getChildren();
+        List<Node<String>> l = child.getChildren();
         Collections.sort(l);
-        for (MarkupContainerTree.Node<String> ch : l) {
+        for (Node<String> ch : l) {
             this.addNodes(nd, ch);
         }
     }
@@ -197,13 +198,13 @@ public class WicketTagNavigator implements NavigatorPanel, LookupListener {
                 return;
             }
             TreePath path = e.getPath();
-            if (path != null && (o = (node = (DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject()) instanceof MarkupContainerTree.Node) {
-                MarkupContainerTree.Node nd = (MarkupContainerTree.Node)o;
+            if (path != null && (o = (node = (DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject()) instanceof Node) {
+                Node nd = (Node)o;
                 this.selected(nd);
             }
         }
 
-        private void selected(MarkupContainerTree.Node nd) {
+        private void selected(Node nd) {
             if (this.file == null || !this.file.isValid()) {
                 return;
             }

@@ -23,7 +23,7 @@
  *  org.openide.filesystems.FileObject
  *  org.openide.util.Exceptions
  */
-package org.netbeans.modules.web.wicket.tree;
+package org.netbeans.modules.web.wicket.tree.util;
 
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.ClassTree;
@@ -43,7 +43,6 @@ import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.TreeScanner;
 import com.sun.source.util.Trees;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -57,16 +56,13 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
-import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import org.netbeans.api.java.source.CancellableTask;
 import org.netbeans.api.java.source.ClassIndex;
@@ -86,13 +82,10 @@ import org.netbeans.api.java.source.WorkingCopy;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 
-public abstract class Utils {
-
-    private Utils() {
-    }
+public final class Utils {
 
     public static List<TypeMirror> toTypeMirrors(Iterable<? extends TypeMirrorHandle> types, CompilationInfo info) {
-        ArrayList<TypeMirror> result = new ArrayList<TypeMirror>();
+        ArrayList<TypeMirror> result = new ArrayList<>();
         for (TypeMirrorHandle h : types) {
             result.add(h.resolve(info));
         }
@@ -100,13 +93,14 @@ public abstract class Utils {
     }
 
     public static List<TypeMirrorHandle> toTypeMirrorHandles(Iterable<? extends TypeMirror> types) {
-        ArrayList<TypeMirrorHandle> result = new ArrayList<TypeMirrorHandle>();
+        ArrayList<TypeMirrorHandle> result = new ArrayList<>();
         for (TypeMirror h : types) {
             result.add(TypeMirrorHandle.create((TypeMirror)h));
         }
         return result;
     }
 
+    @SuppressWarnings("null")
     public static List<Tree> toTrees(Iterable<? extends TreePathHandle> handles, CompilationInfo info) {
         ArrayList<Tree> result = new ArrayList<>(handles instanceof Collection ? ((Collection)handles).size() : 11);
         for (TreePathHandle handle : handles) {
@@ -133,7 +127,7 @@ public abstract class Utils {
     }
 
     public static List<TreePathHandle> toHandles(TreePath parent, Iterable<? extends Tree> trees, CompilationInfo info) {
-        ArrayList<TreePathHandle> result = new ArrayList<TreePathHandle>(trees instanceof Collection ? ((Collection)trees).size() : 11);
+        ArrayList<TreePathHandle> result = new ArrayList<>(trees instanceof Collection ? ((Collection)trees).size() : 11);
         for (Tree tree : trees) {
             TreePath path = TreePath.getPath(parent, tree);
             TreePathHandle handle = TreePathHandle.create((TreePath)path, (CompilationInfo)info);
@@ -145,7 +139,7 @@ public abstract class Utils {
     }
 
     public static List<TreePathHandle> toHandles(Iterable<? extends Tree> trees, CompilationInfo info) {
-        ArrayList<TreePathHandle> result = new ArrayList<TreePathHandle>(trees instanceof Collection ? ((Collection)trees).size() : 11);
+        ArrayList<TreePathHandle> result = new ArrayList<>(trees instanceof Collection ? ((Collection)trees).size() : 11);
         for (Tree tree : trees) {
             TreePath path = TreePath.getPath(info.getCompilationUnit(), tree);
             if (path == null) {
@@ -160,7 +154,7 @@ public abstract class Utils {
     }
 
     public static <T extends Element> List<ElementHandle<T>> toHandles(Iterable<? extends T> elements) {
-        ArrayList<ElementHandle<T>> result = new ArrayList<ElementHandle<T>>(elements instanceof Collection ? ((Collection)elements).size() : 11);
+        ArrayList<ElementHandle<T>> result = new ArrayList<>(elements instanceof Collection ? ((Collection)elements).size() : 11);
         for (Element element : elements) {
             ElementHandle handle = ElementHandle.create((Element)element);
             assert (handle != null);
@@ -170,7 +164,7 @@ public abstract class Utils {
     }
 
     public static <T extends Element> Map<Element, ElementHandle> mapHandles(Iterable<? extends T> elements) {
-        HashMap<Element, ElementHandle> result = new HashMap<Element, ElementHandle>(elements instanceof Collection ? ((Collection)elements).size() : 11);
+        HashMap<Element, ElementHandle> result = new HashMap<>(elements instanceof Collection ? ((Collection)elements).size() : 11);
         for (Element element : elements) {
             ElementHandle handle = ElementHandle.create((Element)element);
             assert (handle != null);
@@ -208,9 +202,9 @@ public abstract class Utils {
         switch (element.getKind()) {
             case METHOD: {
                 MethodTree mt = (MethodTree)old;
-                ArrayList<? extends VariableTree> parameters = new ArrayList<VariableTree>(mt.getParameters());
-                ArrayList<? extends TypeParameterTree> typeParameters = new ArrayList<TypeParameterTree>(mt.getTypeParameters());
-                ArrayList<? extends ExpressionTree> throes = new ArrayList<ExpressionTree>(mt.getThrows());
+                ArrayList<? extends VariableTree> parameters = new ArrayList<>(mt.getParameters());
+                ArrayList<? extends TypeParameterTree> typeParameters = new ArrayList<>(mt.getTypeParameters());
+                ArrayList<? extends ExpressionTree> throes = new ArrayList<>(mt.getThrows());
                 Tree ret = mt.getReturnType();
                 BlockTree body = mt.getBody();
                 ExpressionTree defaultValue = (ExpressionTree)mt.getDefaultValue();
@@ -221,9 +215,9 @@ public abstract class Utils {
             }
             case CONSTRUCTOR: {
                 MethodTree mt = (MethodTree)old;
-                ArrayList<? extends VariableTree> parameters = new ArrayList<VariableTree>(mt.getParameters());
-                ArrayList<? extends TypeParameterTree> typeParameters = new ArrayList<TypeParameterTree>(mt.getTypeParameters());
-                ArrayList<? extends ExpressionTree> throes = new ArrayList<ExpressionTree>(mt.getThrows());
+                ArrayList<? extends VariableTree> parameters = new ArrayList<>(mt.getParameters());
+                ArrayList<? extends TypeParameterTree> typeParameters = new ArrayList<>(mt.getTypeParameters());
+                ArrayList<? extends ExpressionTree> throes = new ArrayList<>(mt.getThrows());
                 BlockTree body = mt.getBody();
                 CompilationUnitTree cut = wc.getCompilationUnit();
                 SourcePositions sp = wc.getTrees().getSourcePositions();
@@ -247,9 +241,9 @@ public abstract class Utils {
                 ClassTree ct = (ClassTree)old;
                 ModifiersTree modifiers = ct.getModifiers();
                 String simpleName = ct.getSimpleName().toString();
-                ArrayList<? extends TypeParameterTree> typeParameters = new ArrayList<TypeParameterTree>(ct.getTypeParameters());
-                ArrayList<? extends Tree> implementsClauses = new ArrayList<Tree>(ct.getImplementsClause());
-                ArrayList<? extends Tree> memberDecls = new ArrayList<Tree>(ct.getMembers());
+                ArrayList<? extends TypeParameterTree> typeParameters = new ArrayList<>(ct.getTypeParameters());
+                ArrayList<? extends Tree> implementsClauses = new ArrayList<>(ct.getImplementsClause());
+                ArrayList<? extends Tree> memberDecls = new ArrayList<>(ct.getMembers());
                 result = maker.Class(modifiers, (CharSequence)simpleName, typeParameters, result, implementsClauses, memberDecls);
                 break;
             }
@@ -261,7 +255,7 @@ public abstract class Utils {
     }
 
     public static List<TreePath> toPaths(TreePath parent, List<? extends Tree> trees, CompilationInfo info) {
-        ArrayList<TreePath> result = new ArrayList<TreePath>(trees.size());
+        ArrayList<TreePath> result = new ArrayList<>(trees.size());
         for (Tree tree : trees) {
             TreePath path = TreePath.getPath(parent, tree);
             result.add(path);
@@ -270,7 +264,7 @@ public abstract class Utils {
     }
 
     public static List<TreePathHandle> fromElements(Iterable<? extends Element> elements, CompilationInfo info) {
-        ArrayList<TreePathHandle> result = new ArrayList<TreePathHandle>(elements instanceof Collection ? ((Collection)elements).size() : 11);
+        ArrayList<TreePathHandle> result = new ArrayList<>(elements instanceof Collection ? ((Collection)elements).size() : 11);
         for (Element e : elements) {
             TreePathHandle handle = TreePathHandle.create((Element)e, (CompilationInfo)info);
             result.add(handle);
@@ -279,7 +273,7 @@ public abstract class Utils {
     }
 
     public static List<TreePath> toPaths(Iterable<? extends Element> elements, Trees trees) {
-        ArrayList<TreePath> result = new ArrayList<TreePath>(elements instanceof Collection ? ((Collection)elements).size() : 11);
+        ArrayList<TreePath> result = new ArrayList<>(elements instanceof Collection ? ((Collection)elements).size() : 11);
         for (Element e : elements) {
             TreePath path = trees.getPath(e);
             result.add(path);
@@ -288,7 +282,7 @@ public abstract class Utils {
     }
 
     public static List<Element> toElements(Iterable<? extends TreePathHandle> handles, CompilationInfo info) {
-        ArrayList<Element> result = new ArrayList<Element>(handles instanceof Collection ? ((Collection)handles).size() : 11);
+        ArrayList<Element> result = new ArrayList<>(handles instanceof Collection ? ((Collection)handles).size() : 11);
         for (TreePathHandle handle : handles) {
             Element element = handle.resolveElement(info);
             result.add(element);
@@ -297,7 +291,7 @@ public abstract class Utils {
     }
 
     public static boolean isStatic(Element el, Scope scope, CompilationController cc) {
-        return cc.getTreeUtilities().isStaticContext(scope) || el.getModifiers().contains((Object)Modifier.STATIC);
+        return cc.getTreeUtilities().isStaticContext(scope) || el.getModifiers().contains(Modifier.STATIC);
     }
 
     public static BlockTree findBlockTree(Tree tree) {
@@ -311,6 +305,7 @@ public abstract class Utils {
         return result;
     }
 
+    @SuppressWarnings("null")
     public static Tree resolveTreePathHandle(TreePathHandle handle) throws IOException {
         FileObject fob = handle.getFileObject();
         JavaSource src = JavaSource.forFileObject((FileObject)fob);
@@ -328,14 +323,15 @@ public abstract class Utils {
         return result;
     }
 
+    @SuppressWarnings("null")
     public static Collection<TreePathHandle> getOverridingMethodHandles(ExecutableElement e, CompilationController cc) throws IOException {
         Collection<ElementHandle<ExecutableElement>> mtds = Utils.getOverridingMethods(e, (CompilationInfo)cc);
-        HashSet<TreePathHandle> result = new HashSet<TreePathHandle>();
+        HashSet<TreePathHandle> result = new HashSet<>();
         ElementHandle toFind = ElementHandle.create((Element)e);
         for (ElementHandle<ExecutableElement> element : mtds) {
             FileObject fob = SourceUtils.getFile(element, (ClasspathInfo)cc.getClasspathInfo());
             JavaSource src = JavaSource.forFileObject((FileObject)fob);
-            assert (src.getFileObjects().contains((Object)fob));
+            assert (src.getFileObjects().contains(fob));
             TreeFromElementFinder finder = new TreeFromElementFinder(element);
             src.runUserActionTask((Task)finder, false);
             if (finder.handle == null) {
@@ -346,6 +342,7 @@ public abstract class Utils {
         return result;
     }
 
+    @SuppressWarnings("null")
     public static Collection<ElementHandle<ExecutableElement>> getOverridingMethods(ExecutableElement e, CompilationInfo info) {
 
         Collection<ElementHandle<ExecutableElement>> result = new ArrayList<>();
@@ -386,6 +383,7 @@ public abstract class Utils {
         return result;
     }
 
+    @SuppressWarnings("null")
     public static Collection<TreePathHandle> getReferencesToMember(ElementHandle<TypeElement> on, ClasspathInfo info, ElementHandle toFind) throws IOException {
         FileObject ob = SourceUtils.getFile(on, (ClasspathInfo)info);
         assert (ob != null);
@@ -395,51 +393,20 @@ public abstract class Utils {
         return scanner.usages;
     }
 
-    private static Collection<ExecutableElement> getOverriddenMethods(ExecutableElement e, TypeElement parent, CompilationInfo info) {
-        ArrayList<ExecutableElement> result = new ArrayList<ExecutableElement>();
-        TypeMirror sup = parent.getSuperclass();
-        if (sup.getKind() == TypeKind.DECLARED) {
-            TypeElement next = (TypeElement)((DeclaredType)sup).asElement();
-            ExecutableElement overriden = Utils.getMethod(e, next, info);
-            result.addAll(Utils.getOverriddenMethods(e, next, info));
-            if (overriden != null) {
-                result.add(overriden);
-            }
-        }
-        for (TypeMirror tm : parent.getInterfaces()) {
-            TypeElement next = (TypeElement)((DeclaredType)tm).asElement();
-            ExecutableElement overriden2 = Utils.getMethod(e, next, info);
-            result.addAll(Utils.getOverriddenMethods(e, next, info));
-            if (overriden2 == null) {
-                continue;
-            }
-            result.add(overriden2);
-        }
-        return result;
-    }
-
-    private static ExecutableElement getMethod(ExecutableElement method, TypeElement type, CompilationInfo info) {
-        for (ExecutableElement met : ElementFilter.methodsIn(type.getEnclosedElements())) {
-            if (!info.getElements().overrides(method, met, type)) {
-                continue;
-            }
-            return met;
-        }
-        return null;
-    }
-
-    public static /* varargs */ <R, D> Map<TreePathHandle, Map<TreeVisitor<R, D>, R>> runAgainstSources(Iterable<TreePathHandle> handles, D arg, TreeVisitor<R, D>... visitors) throws IOException {
-        HashMap<TreePathHandle, Map<TreeVisitor<R, D>, R>> results = new HashMap<TreePathHandle, Map<TreeVisitor<R, D>, R>>();
+    @SuppressWarnings("null")
+    public static <R, D> Map<TreePathHandle, Map<TreeVisitor<R, D>, R>> runAgainstSources(Iterable<TreePathHandle> handles, D arg, TreeVisitor<R, D>... visitors) throws IOException {
+        HashMap<TreePathHandle, Map<TreeVisitor<R, D>, R>> results = new HashMap<>();
         for (TreePathHandle handle : handles) {
             FileObject fob = handle.getFileObject();
             JavaSource src = JavaSource.forFileObject((FileObject)fob);
-            MultiVisitorRunner<R, D> runner = new MultiVisitorRunner<R, D>(handle, arg, visitors);
+            MultiVisitorRunner<R, D> runner = new MultiVisitorRunner<>(handle, arg, visitors);
             src.runUserActionTask(runner, true);
             results.put(handle, runner.results);
         }
         return results;
     }
 
+    @SuppressWarnings("null")
     public static void runAgainstSources(Iterable<TreePathHandle> handles, CancellableTask<CompilationController> c) throws IOException {
         for (TreePathHandle handle : handles) {
             FileObject fob = handle.getFileObject();
@@ -448,6 +415,7 @@ public abstract class Utils {
         }
     }
 
+    @SuppressWarnings("null")
     public static <T> void runAgainstSources(Iterable<TreePathHandle> handles, TreePathHandleTask<T> t, T arg) throws IOException {
         for (TreePathHandle handle : handles) {
             FileObject file = handle.getFileObject();
@@ -522,8 +490,8 @@ public abstract class Utils {
         boolean isSuperType = Utils.isSupertype(ownerOfMemberSelect, ownerType, compiler);
         boolean same = pathToOwnerOfSelectedMember.getLeaf().equals(pathToOwnerOfMemberSelect.getLeaf());
         if (same || enclosed || isSuperType) {
-            boolean statik = selected.getModifiers().contains((Object)Modifier.STATIC);
-            if (statik) {
+            boolean isElementStatic = selected.getModifiers().contains(Modifier.STATIC);
+            if (isElementStatic) {
                 System.err.println("   a");
                 PackageElement ownerPackage = compiler.getElements().getPackageOf(ownerType);
                 PackageElement selectPackage = compiler.getElements().getPackageOf(ownerOfMemberSelect);
@@ -537,7 +505,7 @@ public abstract class Utils {
                 Element enc = ownerType.getEnclosingElement();
                 System.err.println("   d");
                 TypeElement owner = utils.enclosingTypeElement(enc);
-                ArrayList<String> strings = new ArrayList<String>();
+                ArrayList<String> strings = new ArrayList<>();
                 strings.add("this");
                 do {
                     strings.add(0, owner.getSimpleName().toString());
@@ -597,12 +565,12 @@ public abstract class Utils {
         return result;
     }
 
-    static boolean isWebMarkupContainer(Trees trees, Types types, CompilationUnitTree unit, Tree t) {
+    public static boolean isWebMarkupContainer(Trees trees, Types types, CompilationUnitTree unit, Tree t) {
         TypeMirror mirror = trees.getTypeMirror(TreePath.getPath(unit, t));
         return Utils.isWebMarkupContainer(mirror, types);
     }
 
-    static boolean isWebMarkupContainer(TypeMirror mirror, Types types) {
+    public static boolean isWebMarkupContainer(TypeMirror mirror, Types types) {
         boolean result;
         block1:
         {
@@ -643,13 +611,11 @@ public abstract class Utils {
         return result;
     }
 
-    private static final class InvocationScanner
-            extends TreePathScanner<Tree, ElementHandle>
-            implements CancellableTask<CompilationController> {
+    private static final class InvocationScanner extends TreePathScanner<Tree, ElementHandle> implements CancellableTask<CompilationController> {
 
         private CompilationController cc;
         private final ElementHandle toFind;
-        Set<TreePathHandle> usages = new HashSet<TreePathHandle>();
+        Set<TreePathHandle> usages = new HashSet<>();
         boolean cancelled;
 
         InvocationScanner(ElementHandle toFind) {
@@ -685,10 +651,12 @@ public abstract class Utils {
             this.usages.add(TreePathHandle.create((TreePath)path, (CompilationInfo)this.cc));
         }
 
+        @Override
         public void cancel() {
             this.cancelled = true;
         }
 
+        @Override
         public void run(CompilationController cc) throws Exception {
             if (this.cancelled) {
                 return;
@@ -707,14 +675,13 @@ public abstract class Utils {
         }
     }
 
-    private static class MultiVisitorRunner<R, D>
-            implements CancellableTask<CompilationController> {
+    private static class MultiVisitorRunner<R, D> implements CancellableTask<CompilationController> {
 
-        private final Map<TreeVisitor<R, D>, R> results = new HashMap<TreeVisitor<R, D>, R>();
+        private final Map<TreeVisitor<R, D>, R> results = new HashMap<>();
         private final TreeVisitor<R, D>[] visitors;
         private final D arg;
-        private TreePathHandle handle;
-        volatile boolean cancelled;
+        private final TreePathHandle handle;
+        private volatile boolean cancelled;
 
         /* varargs */ MultiVisitorRunner(TreePathHandle handle, D arg, TreeVisitor<R, D>... visitors) {
             this.visitors = visitors;
@@ -726,6 +693,7 @@ public abstract class Utils {
             return this.results.get(visitor);
         }
 
+        @Override
         public void cancel() {
             this.cancelled = true;
         }
@@ -756,8 +724,7 @@ public abstract class Utils {
         }
     }
 
-    private static class TreeFinder<T extends Tree>
-            implements CancellableTask<CompilationController> {
+    private static class TreeFinder<T extends Tree> implements CancellableTask<CompilationController> {
 
         Tree tree;
         private final TreePathHandle handle;
@@ -781,8 +748,7 @@ public abstract class Utils {
         }
     }
 
-    private static class TreeFromElementFinder
-            implements CancellableTask<CompilationController> {
+    private static class TreeFromElementFinder implements CancellableTask<CompilationController> {
 
         private volatile boolean cancelled;
         Tree tree;
@@ -793,10 +759,12 @@ public abstract class Utils {
             this.element = element;
         }
 
+        @Override
         public void cancel() {
             this.cancelled = true;
         }
 
+        @Override
         public void run(CompilationController cc) throws Exception {
             if (this.cancelled) {
                 return;
@@ -815,18 +783,19 @@ public abstract class Utils {
         }
     }
 
-    public static abstract class TreePathHandleTask<T>
-            implements CancellableTask<CompilationController> {
+    public static abstract class TreePathHandleTask<T> implements CancellableTask<CompilationController> {
 
         protected boolean cancelled;
         private TreePathHandle handle;
         private T arg;
         private FileObject file;
 
+        @Override
         public void cancel() {
             this.cancelled = true;
         }
 
+        @Override
         public final void run(CompilationController cc) throws Exception {
             cc.toPhase(JavaSource.Phase.RESOLVED);
             this.run(cc, this.handle, this.file, this.arg);
@@ -835,8 +804,7 @@ public abstract class Utils {
         public abstract void run(CompilationController var1, TreePathHandle var2, FileObject var3, T var4);
     }
 
-    private static final class TreePathResolver
-            implements CancellableTask<CompilationController> {
+    private static final class TreePathResolver implements CancellableTask<CompilationController> {
 
         private volatile boolean cancelled = false;
         TreePath path;
@@ -846,10 +814,12 @@ public abstract class Utils {
             this.handle = handle;
         }
 
+        @Override
         public void cancel() {
             this.cancelled = true;
         }
 
+        @Override
         public void run(CompilationController cc) throws Exception {
             if (this.cancelled) {
                 return;
@@ -858,4 +828,6 @@ public abstract class Utils {
         }
     }
 
+    private Utils() {
+    }
 }

@@ -4,11 +4,9 @@
  * Could not load the following classes:
  *  org.openide.util.NbBundle
  */
-package org.netbeans.modules.web.wicket.tree;
+package org.netbeans.modules.web.wicket.tree.util;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,14 +14,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.modules.web.wicket.tree.MarkupContainerTree;
+import org.netbeans.modules.web.wicket.tree.Node;
 import org.netbeans.modules.web.wicket.tree.borrowed.Change;
 import org.netbeans.modules.web.wicket.tree.borrowed.Diff;
 import org.openide.util.NbBundle;
 
 public final class TreeDiff {
 
-    private MarkupContainerTree<String> java;
-    private MarkupContainerTree<String> html;
+    private final MarkupContainerTree<String> java;
+    private final MarkupContainerTree<String> html;
     private static final Logger ERR = Logger.getLogger(TreeDiff.class.getPackage().getName());
 
     public TreeDiff(MarkupContainerTree<String> html, MarkupContainerTree<String> java) {
@@ -37,36 +36,36 @@ public final class TreeDiff {
         return problems;
     }
 
-    private void diff(MarkupContainerTree.Node<String> htmlNode, MarkupContainerTree.Node<String> javaNode, List<Problem> problems) {
+    private void diff(Node<String> htmlNode, Node<String> javaNode, List<Problem> problems) {
         boolean javaDups;
-        List<MarkupContainerTree.Node<String>> dups;
+        List<Node<String>> dups;
         Problem p;
         List<String> htmlKids = this.getChildNodesIds(htmlNode);
         List<String> javaKids = this.getChildNodesIds(javaNode);
-        Iterator<MarkupContainerTree.Node<String>> i1 = htmlNode.getChildren().iterator();
-        Iterator<MarkupContainerTree.Node<String>> i2 = javaNode.getChildren().iterator();
+        Iterator<Node<String>> i1 = htmlNode.getChildren().iterator();
+        Iterator<Node<String>> i2 = javaNode.getChildren().iterator();
         while (i1.hasNext() && i2.hasNext()) {
-            MarkupContainerTree.Node<String> n1 = i1.next();
-            MarkupContainerTree.Node<String> n2 = i2.next();
+            Node<String> n1 = i1.next();
+            Node<String> n2 = i2.next();
             if (!n1.getId().equals(n2.getId())) {
                 continue;
             }
             this.diff(n1, n2, problems);
         }
-        int htmlUniques = new HashSet<String>(htmlKids).size();
-        int javaUniques = new HashSet<String>(javaKids).size();
+        int htmlUniques = new HashSet<>(htmlKids).size();
+        int javaUniques = new HashSet<>(javaKids).size();
         boolean htmlDups = htmlUniques != htmlKids.size();
         boolean bl = javaDups = javaUniques != javaKids.size();
         if (htmlDups) {
             dups = this.findDuplicateIds(htmlNode);
-            for (MarkupContainerTree.Node<String> dup : dups) {
+            for (Node<String> dup : dups) {
                 p = new Problem(ProblemKind.DUPLICATE_HTML_IDS, null, dup, null, htmlNode);
                 problems.add(p);
             }
         }
         if (javaDups) {
             dups = this.findDuplicateIds(javaNode);
-            for (MarkupContainerTree.Node<String> dup : dups) {
+            for (Node<String> dup : dups) {
                 p = new Problem(ProblemKind.DUPLICATE_JAVA_IDS, dup, null, javaNode, null);
                 problems.add(p);
             }
@@ -112,10 +111,10 @@ public final class TreeDiff {
         }
     }
 
-    private List<MarkupContainerTree.Node<String>> findDuplicateIds(MarkupContainerTree.Node<String> parent) {
+    private List<Node<String>> findDuplicateIds(Node<String> parent) {
         HashSet<String> dupCheck = new HashSet<String>();
-        ArrayList<MarkupContainerTree.Node<String>> result = new ArrayList<MarkupContainerTree.Node<String>>();
-        for (MarkupContainerTree.Node<String> child : parent.getChildren()) {
+        ArrayList<Node<String>> result = new ArrayList<Node<String>>();
+        for (Node<String> child : parent.getChildren()) {
             if (dupCheck.contains(child.getId())) {
                 result.add(child);
             }
@@ -124,11 +123,11 @@ public final class TreeDiff {
         return result;
     }
 
-    private List<String> getChildNodesIds(MarkupContainerTree.Node<String> n) {
+    private List<String> getChildNodesIds(Node<String> n) {
         ArrayList<String> result = new ArrayList<String>(n.getChildren().size());
-        ArrayList<MarkupContainerTree.Node<String>> kids = new ArrayList<MarkupContainerTree.Node<String>>(n.getChildren());
+        ArrayList<Node<String>> kids = new ArrayList<Node<String>>(n.getChildren());
         Collections.sort(kids);
-        for (MarkupContainerTree.Node<String> child : kids) {
+        for (Node<String> child : kids) {
             result.add(child.getId());
         }
         return result;
@@ -136,13 +135,13 @@ public final class TreeDiff {
 
     public static final class Problem {
 
-        private final MarkupContainerTree.Node<String> problemJavaNode;
-        private final MarkupContainerTree.Node<String> problemHtmlNode;
-        private final MarkupContainerTree.Node<String> problemParentJavaNode;
-        private final MarkupContainerTree.Node<String> problemParentHtmlNode;
+        private final Node<String> problemJavaNode;
+        private final Node<String> problemHtmlNode;
+        private final Node<String> problemParentJavaNode;
+        private final Node<String> problemParentHtmlNode;
         private final ProblemKind kind;
 
-        public Problem(ProblemKind kind, MarkupContainerTree.Node<String> problemJavaNode, MarkupContainerTree.Node<String> problemHtmlNode, MarkupContainerTree.Node<String> problemParentJavaNode, MarkupContainerTree.Node<String> problemParentHtmlNode) {
+        public Problem(ProblemKind kind, Node<String> problemJavaNode, Node<String> problemHtmlNode, Node<String> problemParentJavaNode, Node<String> problemParentHtmlNode) {
             this.problemJavaNode = problemJavaNode;
             this.problemHtmlNode = problemHtmlNode;
             this.problemParentJavaNode = problemParentJavaNode;
@@ -155,19 +154,19 @@ public final class TreeDiff {
             return this.kind;
         }
 
-        public MarkupContainerTree.Node<String> getProblemHtmlNode() {
+        public Node<String> getProblemHtmlNode() {
             return this.problemHtmlNode;
         }
 
-        public MarkupContainerTree.Node<String> getProblemJavaNode() {
+        public Node<String> getProblemJavaNode() {
             return this.problemJavaNode;
         }
 
-        public MarkupContainerTree.Node<String> getProblemParentHtmlNode() {
+        public Node<String> getProblemParentHtmlNode() {
             return this.problemParentHtmlNode;
         }
 
-        public MarkupContainerTree.Node<String> getProblemParentJavaNode() {
+        public Node<String> getProblemParentJavaNode() {
             return this.problemParentJavaNode;
         }
 

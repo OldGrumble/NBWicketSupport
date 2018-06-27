@@ -1,28 +1,23 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.java.source.CompilationController
+ * Some license issues have still to be clarified, especially for the "borrowed"
+ * package, so <b>don't use it</b>, yet.
  */
-package org.netbeans.modules.web.wicket.tree;
+package org.netbeans.modules.web.wicket.tree.finders;
 
 import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreeScanner;
-import com.sun.source.util.Trees;
 import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Types;
 import org.netbeans.api.java.source.CompilationController;
-import org.netbeans.modules.web.wicket.tree.Utils;
+import org.netbeans.modules.web.wicket.tree.util.Utils;
 
-public class ComponentTypesFinder
-extends TreeScanner<Void, Set<TypeMirror>> {
+public class ComponentTypesFinder extends TreeScanner<Void, Set<TypeMirror>> {
+
     private final CompilationController cc;
 
     ComponentTypesFinder(CompilationController cc) {
@@ -65,4 +60,3 @@ extends TreeScanner<Void, Set<TypeMirror>> {
         return (Void)super.visitVariable(tree, set);
     }
 }
-

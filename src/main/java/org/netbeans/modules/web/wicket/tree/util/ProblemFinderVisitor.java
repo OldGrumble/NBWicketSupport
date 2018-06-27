@@ -6,7 +6,7 @@
  *  org.netbeans.api.java.source.TreePathHandle
  *  org.openide.filesystems.FileObject
  */
-package org.netbeans.modules.web.wicket.tree;
+package org.netbeans.modules.web.wicket.tree.util;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.NewClassTree;
@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.Map;
 import org.netbeans.api.java.source.CompilationController;
 import org.netbeans.api.java.source.TreePathHandle;
-import org.netbeans.modules.web.wicket.tree.Invocation;
 import org.openide.filesystems.FileObject;
 
 public interface ProblemFinderVisitor {
+
     public void visitWicketAddInvocation(Invocation var1, CompilationController var2, FileObject var3, Collection<? super Problem> var4);
 
     public void visitWicketComponentConstruction(NewClassTree var1, CompilationController var2, FileObject var3, List<String> var4, Collection<? super Problem> var5);
@@ -28,6 +28,7 @@ public interface ProblemFinderVisitor {
     public void visitWicketMarkupContainer(ClassTree var1, CompilationController var2, FileObject var3, Collection<? super Problem> var4);
 
     public static final class Problem {
+
         private Map<String, Object> keyValuePairs;
         private final TreePathHandle handle;
         private final String description;
@@ -82,4 +83,3 @@ public interface ProblemFinderVisitor {
     }
 
 }
-

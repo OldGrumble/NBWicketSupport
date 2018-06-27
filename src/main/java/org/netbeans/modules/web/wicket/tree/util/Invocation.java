@@ -1,15 +1,15 @@
 /*
  * Decompiled with CFR 0_130.
  */
-package org.netbeans.modules.web.wicket.tree;
+package org.netbeans.modules.web.wicket.tree.util;
 
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.NewClassTree;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
 
-public final class Invocation
-implements Comparable<Invocation> {
+public final class Invocation implements Comparable<Invocation> {
+
     private final MethodInvocationTree invocation;
     private final Element target;
     private final Element argument;
@@ -131,4 +131,3 @@ implements Comparable<Invocation> {
         return (int)(o.start - this.start);
     }
 }
-

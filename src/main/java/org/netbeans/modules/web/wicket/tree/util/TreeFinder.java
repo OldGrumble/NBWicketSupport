@@ -1,7 +1,7 @@
 /*
  * Decompiled with CFR 0_130.
  */
-package org.netbeans.modules.web.wicket.tree;
+package org.netbeans.modules.web.wicket.tree.util;
 
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;

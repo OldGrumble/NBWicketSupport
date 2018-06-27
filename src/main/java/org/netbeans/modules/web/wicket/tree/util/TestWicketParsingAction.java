@@ -12,13 +12,17 @@
  *  org.openide.util.NbBundle
  *  org.openide.util.actions.CookieAction
  */
-package org.netbeans.modules.web.wicket.tree;
+package org.netbeans.modules.web.wicket.tree.util;
 
+import org.netbeans.modules.web.wicket.tree.finders.TreeCallback;
+import org.netbeans.modules.web.wicket.tree.JavaTreeBuilder;
+import org.netbeans.modules.web.wicket.tree.HtmlTreeBuilder;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.util.List;
 import javax.swing.text.StyledDocument;
 import org.netbeans.api.wicket.MarkupForJavaQuery;
+import org.netbeans.modules.web.wicket.tree.MarkupContainerTree;
 import org.netbeans.modules.web.wicket.util.WicketSupportConstants;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -39,7 +43,7 @@ import org.openide.util.actions.CookieAction;
     @ActionReference(path = "Editors/" + WicketSupportConstants.MIME_TYPE_JAVA + "/Popup"),
     @ActionReference(path = "Loaders/" + WicketSupportConstants.MIME_TYPE_JAVA + "/Actions")
 })
-public final class SomeAction extends CookieAction {
+public final class TestWicketParsingAction extends CookieAction {
 
     @Override
     protected void performAction(Node[] activatedNodes) {
@@ -56,7 +60,7 @@ public final class SomeAction extends CookieAction {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(SomeAction.class, (String)"CTL_SomeAction");
+        return NbBundle.getMessage(TestWicketParsingAction.class, (String)"CTL_SomeAction");
     }
 
     @Override
@@ -80,11 +84,11 @@ public final class SomeAction extends CookieAction {
         return false;
     }
 
-    private class CB implements JavaTreeBuilder.TreeCallback, Runnable {
+    private class CB implements TreeCallback, Runnable {
 
-        private final FileObject javaFile;
-        private MarkupContainerTree<String> javaTree;
-        private MarkupContainerTree<String> htmlTree;
+        final FileObject javaFile;
+        MarkupContainerTree<String> javaTree;
+        MarkupContainerTree<String> htmlTree;
 
         CB(FileObject obj) {
             this.javaFile = obj;

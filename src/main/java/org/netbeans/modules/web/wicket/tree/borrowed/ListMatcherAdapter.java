@@ -1,15 +1,11 @@
 /*
- * Decompiled with CFR 0_130.
+ * Some license issues have still to be clarified, especially for the "borrowed"
+ * package, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.borrowed;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.netbeans.modules.web.wicket.tree.borrowed.Change;
-import org.netbeans.modules.web.wicket.tree.borrowed.Diff;
-import org.netbeans.modules.web.wicket.tree.borrowed.ListDiffChange;
-import org.netbeans.modules.web.wicket.tree.borrowed.ListMatcher;
-import org.netbeans.modules.web.wicket.tree.borrowed.Measure;
 
 class ListMatcherAdapter<E> extends Diff<E> {
 
@@ -64,7 +60,7 @@ class ListMatcherAdapter<E> extends Diff<E> {
 
     private class IndexProcessor /* Umbenannt; Originalname = "I" */ {
 
-        public final List<Change> changes = new ArrayList<Change>();
+        public final List<Change> changes = new ArrayList<>();
         ListDiffChange currChange = null;
         int offset = 0;
 

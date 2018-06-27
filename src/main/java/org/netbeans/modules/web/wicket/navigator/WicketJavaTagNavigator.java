@@ -38,6 +38,8 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import org.netbeans.modules.web.wicket.tree.JavaTreeBuilder;
 import org.netbeans.modules.web.wicket.tree.MarkupContainerTree;
+import org.netbeans.modules.web.wicket.tree.Node;
+import org.netbeans.modules.web.wicket.tree.finders.TreeCallback;
 import org.netbeans.modules.web.wicket.util.WicketSupportConstants;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.openide.cookies.EditorCookie;
@@ -157,11 +159,11 @@ public class WicketJavaTagNavigator implements NavigatorPanel, LookupListener {
     }
 
     private class CB
-            implements JavaTreeBuilder.TreeCallback {
+            implements TreeCallback {
 
         volatile boolean cancelled = false;
-        private final FileObject fob;
-        private final Pnl pnl;
+        final FileObject fob;
+        final Pnl pnl;
 
         CB(FileObject fob, Pnl pnl) {
             this.fob = fob;
@@ -240,13 +242,13 @@ public class WicketJavaTagNavigator implements NavigatorPanel, LookupListener {
                 return;
             }
             TreePath path = e.getPath();
-            if (path != null && (o = (node = (DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject()) instanceof MarkupContainerTree.Node) {
-                MarkupContainerTree.Node nd = (MarkupContainerTree.Node)o;
+            if (path != null && (o = (node = (DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject()) instanceof Node) {
+                Node nd = (Node)o;
                 this.selected(nd);
             }
         }
 
-        private void selected(MarkupContainerTree.Node nd) {
+        private void selected(Node nd) {
             if (this.file == null || !this.file.isValid()) {
                 return;
             }

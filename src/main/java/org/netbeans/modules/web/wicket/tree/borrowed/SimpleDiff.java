@@ -1,18 +1,16 @@
 /*
- * Decompiled with CFR 0_130.
+ * Some license issues have still to be clarified, especially for the "borrowed"
+ * package, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.borrowed;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import org.netbeans.modules.web.wicket.tree.borrowed.Change;
-import org.netbeans.modules.web.wicket.tree.borrowed.Diff;
 
-final class SimpleDiff<T>
-extends Diff<T> {
+final class SimpleDiff<T> extends Diff<T> {
+
     private List<T> old;
     private List<T> nue;
     private List<Change> changes;
@@ -77,20 +75,24 @@ extends Diff<T> {
         return this.nue;
     }
 
+    @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Iterator<Change> i = this.changes.iterator();
         while (i.hasNext()) {
             Change change = i.next();
             sb.append(change);
-            if (!i.hasNext()) continue;
+            if (!i.hasNext()) {
+                continue;
+            }
             sb.append(",");
         }
         return sb.toString();
     }
 
     static final class C
-    implements Change {
+            implements Change {
+
         private final int start;
         private final int end;
         private final int type;
@@ -124,6 +126,7 @@ extends Diff<T> {
             return this.type;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (o instanceof Change) {
                 Change c = (Change)o;
@@ -132,12 +135,14 @@ extends Diff<T> {
             return false;
         }
 
+        @Override
         public int hashCode() {
             return (this.start + this.end) * ((this.type + 3) * 1299709);
         }
 
+        @Override
         public final String toString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             switch (this.type) {
                 case 1: {
                     sb.append("INSERT ");
@@ -164,4 +169,3 @@ extends Diff<T> {
     }
 
 }
-

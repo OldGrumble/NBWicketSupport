@@ -3,13 +3,11 @@
  */
 package org.netbeans.modules.web.wicket.tree.borrowed;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import org.netbeans.modules.web.wicket.tree.borrowed.Measure;
 
-public final class ListMatcher<E> {
+/* public */ final class ListMatcher<E> {
 
     private final E[] oldL;
     private final E[] newL;
@@ -36,15 +34,15 @@ public final class ListMatcher<E> {
     }
 
     public static <T> ListMatcher<T> instance(List<? extends T> oldL, List<? extends T> newL) {
-        return new ListMatcher<T>(oldL, newL);
+        return new ListMatcher<>(oldL, newL);
     }
 
     public static <T> ListMatcher<T> instance(List<? extends T> oldL, List<? extends T> newL, Measure measure) {
-        return new ListMatcher<T>(oldL, newL, measure);
+        return new ListMatcher<>(oldL, newL, measure);
     }
 
     public static <T> ListMatcher<T> instance(T[] oldL, T[] newL) {
-        return new ListMatcher<T>(oldL, newL);
+        return new ListMatcher<>(oldL, newL);
     }
 
     public boolean match() {

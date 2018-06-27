@@ -1,29 +1,23 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.java.source.CompilationController
+ * Some license issues have still to be clarified, especially for the "borrowed"
+ * package, so <b>don't use it</b>, yet.
  */
-package org.netbeans.modules.web.wicket.tree;
+package org.netbeans.modules.web.wicket.tree.finders;
 
 import com.sun.source.tree.AssignmentTree;
-import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreeScanner;
-import com.sun.source.util.Trees;
-import java.io.PrintStream;
 import java.util.Set;
-import javax.lang.model.util.Types;
 import org.netbeans.api.java.source.CompilationController;
-import org.netbeans.modules.web.wicket.tree.Utils;
+import org.netbeans.modules.web.wicket.tree.util.Utils;
 
-public class ComponentAssignmentToVariableFinder
-extends TreeScanner<Void, Set<Tree>> {
-    private CompilationController cc;
+public class ComponentAssignmentToVariableFinder extends TreeScanner<Void, Set<Tree>> {
 
-    ComponentAssignmentToVariableFinder(CompilationController cc) {
+    private final CompilationController cc;
+
+    public ComponentAssignmentToVariableFinder(CompilationController cc) {
         this.cc = cc;
     }
 
@@ -49,4 +43,3 @@ extends TreeScanner<Void, Set<Tree>> {
         return (Void)super.visitAssignment(tree, set);
     }
 }
-

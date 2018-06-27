@@ -1,12 +1,11 @@
 /*
- * Decompiled with CFR 0_130.
+ * Some license issues have still to be clarified, especially for the "borrowed"
+ * package, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.borrowed;
 
-import org.netbeans.modules.web.wicket.tree.borrowed.Change;
+final class ListDiffChange implements Change {
 
-final class ListDiffChange
-implements Change {
     private final int type;
     private final int start;
     private int end;
@@ -57,8 +56,9 @@ implements Change {
         return this.end;
     }
 
+    @Override
     public final String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         switch (this.type) {
             case 1: {
                 sb.append("INSERT ");
@@ -83,4 +83,3 @@ implements Change {
         return sb.toString();
     }
 }
-

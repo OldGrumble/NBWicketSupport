@@ -1,37 +1,30 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.java.source.CompilationController
+ * Some license issues have still to be clarified, especially for the "borrowed"
+ * package, so <b>don't use it</b>, yet.
  */
-package org.netbeans.modules.web.wicket.tree;
+package org.netbeans.modules.web.wicket.tree.finders;
 
 import com.sun.source.tree.AssignmentTree;
-import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.tree.TreeVisitor;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreeScanner;
-import com.sun.source.util.Trees;
-import java.io.PrintStream;
 import java.util.Set;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.Name;
 import org.netbeans.api.java.source.CompilationController;
 
-final class AssignmentTracer
-extends TreeScanner<Void, Set<NewClassTree>> {
-    private CompilationController cc;
-    private Tree scan;
+final class AssignmentTracer extends TreeScanner<Void, Set<NewClassTree>> {
+
+    private final CompilationController cc;
+    private final Tree scan;
+    private final Element identifier;
     private AssignmentTracer parent;
-    private Element identifier;
-    int tryFindReturnType = 0;
+    private int tryFindReturnType = 0;
 
     AssignmentTracer(CompilationController cc, Tree scan, Element identifier) {
         this.cc = cc;
@@ -61,7 +54,9 @@ extends TreeScanner<Void, Set<NewClassTree>> {
                 }
                 case IDENTIFIER: {
                     Element identified = this.cc.getTrees().getElement(TreePath.getPath(this.cc.getCompilationUnit(), (Tree)ret));
-                    if (this.isKnown(identified)) break;
+                    if (this.isKnown(identified)) {
+                        break;
+                    }
                     Tree newTree = this.cc.getTrees().getTree(identified);
                     AssignmentTracer at = new AssignmentTracer(this.cc, this.scan, identified);
                     newTree.accept(at, set);
@@ -90,11 +85,9 @@ extends TreeScanner<Void, Set<NewClassTree>> {
             Element el = this.cc.getTrees().getElement(TreePath.getPath(this.cc.getCompilationUnit(), (Tree)select));
             Tree methodTree = this.cc.getTrees().getTree(el);
             methodTree.accept(this, set);
-        }
-        catch (StackOverflowError e) {
+        } catch (StackOverflowError e) {
             System.err.println("Recursion or cicular call encountered from " + mit);
-        }
-        finally {
+        } finally {
             --this.tryFindReturnType;
         }
     }
@@ -118,7 +111,9 @@ extends TreeScanner<Void, Set<NewClassTree>> {
                 case IDENTIFIER: {
                     IdentifierTree id = (IdentifierTree)ect;
                     Element nue = this.cc.getTrees().getElement(TreePath.getPath(this.cc.getCompilationUnit(), (Tree)ect));
-                    if (this.isKnown(nue)) break;
+                    if (this.isKnown(nue)) {
+                        break;
+                    }
                     Tree newTree = this.cc.getTrees().getTree(nue);
                     AssignmentTracer newTracer = new AssignmentTracer(this.cc, this.scan, nue, this);
                     newTree.accept(newTracer, set);
@@ -134,8 +129,7 @@ extends TreeScanner<Void, Set<NewClassTree>> {
         ExpressionTree var = tree.getVariable();
         try {
             varEl = this.cc.getTrees().getElement(TreePath.getPath(this.cc.getCompilationUnit(), (Tree)var));
-        }
-        catch (NullPointerException npe) {
+        } catch (NullPointerException npe) {
             return null;
         }
         if (this.identifier.equals(varEl)) {
@@ -150,14 +144,11 @@ extends TreeScanner<Void, Set<NewClassTree>> {
                         AssignmentTracer newTracer = new AssignmentTracer(this.cc, this.scan, this.identifier, this);
                         newTree.accept(newTracer, set);
                     }
-                }
-                catch (NullPointerException e) {
+                } catch (NullPointerException e) {
                     return null;
                 }
             }
         }
         return (Void)super.visitAssignment(tree, set);
     }
-
 }
-

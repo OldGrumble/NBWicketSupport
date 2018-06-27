@@ -1,9 +1,11 @@
 /*
- * Decompiled with CFR 0_130.
+ * Some license issues have still to be clarified, especially for the "borrowed"
+ * package, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.borrowed;
 
-public class Measure {
+/* public */ class Measure {
+
     static final Measure DEFAULT = new Measure();
     static final int INFINITE_DISTANCE = 1000;
     static final int OBJECTS_MATCH = 0;
@@ -19,11 +21,11 @@ public class Measure {
             Comparable c2 = (Comparable)second;
             return c1.compareTo(c2);
         }
-        return 1000;
+        return INFINITE_DISTANCE;
     }
 
-    private static final class OrderedArrayMeasure
-    extends Measure {
+    private static final class OrderedArrayMeasure extends Measure {
+
         private final Measure measure;
 
         OrderedArrayMeasure(Measure elementsMeasure) {
@@ -39,20 +41,20 @@ public class Measure {
             int result = 0;
             if (minSize == 0) {
                 if (difference != 0) {
-                    result = 1000;
+                    result = INFINITE_DISTANCE;
                 }
                 return result;
             }
             for (int i = 0; i < minSize; ++i) {
                 result += this.measure.getDistance(array1[i], array2[i]);
             }
-            result += difference * 1000;
-            return (result /= minSize + difference) > 1000 ? 1000 : result;
+            result += difference * INFINITE_DISTANCE;
+            return (result /= minSize + difference) > INFINITE_DISTANCE ? INFINITE_DISTANCE : result;
         }
     }
 
-    private static final class StringMeasure
-    extends Measure {
+    private static final class StringMeasure extends Measure {
+
         private static final int SAME = 0;
         private static final int CASE_SAME = 1;
         private static final int DIFFERENT = 10;
@@ -66,7 +68,7 @@ public class Measure {
                 return 0;
             }
             if (first == null || second == null) {
-                return 1000;
+                return INFINITE_DISTANCE;
             }
             String x = (String)first;
             String y = (String)second;
@@ -118,18 +120,16 @@ public class Measure {
                 }
                 errors += 10;
             }
-            return 1000 * (errors += (xlen - xindex + ylen - yindex) * 10) / Math.max(ylen, xlen) / 10;
+            return INFINITE_DISTANCE * (errors += (xlen - xindex + ylen - yindex) * 10) / Math.max(ylen, xlen) / 10;
         }
 
-        private static final int compareChars(char xc, char yc) {
+        private static int compareChars(char xc, char yc) {
             char ylower;
             if (xc == yc) {
                 return 0;
             }
             char xlower = Character.toLowerCase(xc);
-            return xlower == (ylower = Character.toLowerCase(yc)) ? 1 : 10;
+            return xlower == (ylower = Character.toLowerCase(yc)) ? CASE_SAME : DIFFERENT;
         }
     }
-
 }
-

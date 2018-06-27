@@ -1,26 +1,22 @@
 /*
- * Decompiled with CFR 0_130.
+ * Some license issues have still to be clarified, especially for the "borrowed"
+ * package, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.borrowed;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import org.netbeans.modules.web.wicket.tree.borrowed.Change;
-import org.netbeans.modules.web.wicket.tree.borrowed.ListDiff;
-import org.netbeans.modules.web.wicket.tree.borrowed.ListMatcherAdapter;
-import org.netbeans.modules.web.wicket.tree.borrowed.Measure;
 
+/*
+TODO-PROTECT: Verwendet in tree.TreeDiff
+ */
 public abstract class Diff<T> {
 
-    private static boolean VALIDATE = Boolean.getBoolean("org.netbeans.misc.diff.validate");
-    private static boolean $assertionsDisabled;
+    private static final boolean VALIDATE = Boolean.getBoolean("org.netbeans.misc.diff.validate");
 
     public static <T> Diff<T> create(List<T> old, List<T> nue) {
-        ListDiff<T> result = new ListDiff<T>(old, nue);
-        if (VALIDATE && !$assertionsDisabled && !Diff.validDiff(result)) {
-            throw new AssertionError();
-        }
+        ListDiff<T> result = new ListDiff<>(old, nue);
+        assert !VALIDATE || Diff.validDiff(result);
         return result;
     }
 
@@ -32,7 +28,7 @@ public abstract class Diff<T> {
                 break;
             }
             case LONGEST_COMMON_SEQUENCE: {
-                result = new ListMatcherAdapter<T>(old, nue);
+                result = new ListMatcherAdapter<>(old, nue);
                 break;
             }
             default: {
@@ -46,7 +42,7 @@ public abstract class Diff<T> {
     }
 
     public static <T> Diff<T> create(List<T> old, List<T> nue, Measure measure) {
-        ListMatcherAdapter<T> result = new ListMatcherAdapter<T>(old, nue, measure);
+        ListMatcherAdapter<T> result = new ListMatcherAdapter<>(old, nue, measure);
         if (VALIDATE && !Diff.validDiff(result)) {
             throw new IllegalStateException("Invalid diff " + result);
         }
@@ -63,7 +59,7 @@ public abstract class Diff<T> {
         if (changes == null) {
             throw new NullPointerException("Change list null");
         }
-        ListDiff<T> result = new ListDiff<T>(old, nue);
+        ListDiff<T> result = new ListDiff<>(old, nue);
         result.changes = changes;
         if (!Diff.validDiff(result)) {
             throw new IllegalStateException("Invalid diff " + result);
@@ -71,12 +67,11 @@ public abstract class Diff<T> {
         return result;
     }
 
-    private static final <T> boolean validDiff(Diff<T> diff) {
+    private static <T> boolean validDiff(Diff<T> diff) {
         boolean result;
-        ArrayList<T> list = new ArrayList<T>(diff.getOld());
+        ArrayList<T> list = new ArrayList<>(diff.getOld());
         List<T> target = diff.getNew();
         List<Change> changes = diff.getChanges();
-        block5:
         for (Change change : changes) {
             int start = change.getStart();
             int end = change.getEnd();
@@ -85,14 +80,14 @@ public abstract class Diff<T> {
                     for (int i = start; i <= end; ++i) {
                         list.set(i, target.get(i));
                     }
-                    continue block5;
+                    break;
                 }
                 case 1: {
                     for (int i = end; i >= start; --i) {
                         T o = target.get(i);
                         list.add(start, o);
                     }
-                    continue block5;
+                    break;
                 }
                 case 2: {
                     for (int i = end; i >= start; --i) {

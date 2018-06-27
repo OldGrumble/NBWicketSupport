@@ -1,26 +1,25 @@
 /*
- * Decompiled with CFR 0_130.
+ * Some license issues have still to be clarified, especially for the "borrowed"
+ * package, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.borrowed;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import org.netbeans.modules.web.wicket.tree.borrowed.Change;
-import org.netbeans.modules.web.wicket.tree.borrowed.ListDiffChange;
 
 final class ParallelIterator<T> {
+
     private final List<T> old;
     private final List<T> nue;
     private Iterator<T> oi;
     private Iterator<T> ni;
     private Set<T> h_old = null;
     private Set<T> h_new = null;
-    private final List<Change> changes = new ArrayList<Change>(5);
+    private final List<Change> changes = new ArrayList<>(5);
     private T lastOld;
     private T lastNue;
     private boolean oiHadNext = true;
@@ -142,8 +141,8 @@ final class ParallelIterator<T> {
 
     private void ensureSets() {
         if (this.h_old == null) {
-            this.h_old = new HashSet<T>(this.old);
-            this.h_new = new HashSet<T>(this.nue);
+            this.h_old = new HashSet<>(this.old);
+            this.h_new = new HashSet<>(this.nue);
             if (this.h_old.size() != this.old.size()) {
                 throw new IllegalStateException("Duplicate elements - size of list does not match size of equivalent HashSet " + this.identifyDuplicates(this.old));
             }
@@ -153,18 +152,19 @@ final class ParallelIterator<T> {
         }
     }
 
-    private String identifyDuplicates(List<T> l) {
-        HashMap<T, Integer> map = new HashMap<T, Integer>();
-        for (T o : l) {
-            Integer count = (Integer)map.get(o);
-            count = count == null ? new Integer(1) : new Integer(count + 1);
-            map.put(o, count);
+    private String identifyDuplicates(List<T> list) {
+        HashMap<T, Integer> map = new HashMap<>();
+        for (T key : list) {
+            Integer count = map.get(key);
+            count = count == null ? 1 : count + 1;
+            map.put(key, count);
         }
-        StringBuffer sb = new StringBuffer("Duplicates: ");
-        for (Object key : map.keySet()) {
-            Integer ct = (Integer)map.get(key);
-            if (ct <= 1) continue;
-            sb.append("[" + ct + " occurances of " + key + "]");
+        StringBuilder sb = new StringBuilder("Duplicates: ");
+        for (T key : map.keySet()) {
+            Integer ct = map.get(key);
+            if (ct > 1) {
+                sb.append("[").append(ct).append(" occurances of ").append(key).append("]");
+            }
         }
         return sb.toString();
     }
@@ -220,4 +220,3 @@ final class ParallelIterator<T> {
         this.currChange = null;
     }
 }
-
