@@ -58,6 +58,10 @@ public class WicketConfigurationPanelVisual extends JPanel implements HelpCtx.Pr
 
     /**
      * Creates new form WicketConfigurationPanelVisual
+     * 
+     * @param extender Extends the panel by a status line etc.
+     * @param framework Provides access to Wicket and its configuration
+     * @param enableComponents Flag indicating if the components should be enabled
      */
     public WicketConfigurationPanelVisual(WicketWebModuleExtender extender, WicketFrameworkProvider framework, boolean enableComponents) {
         this.extender = extender;

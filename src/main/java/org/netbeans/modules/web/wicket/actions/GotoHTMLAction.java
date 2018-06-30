@@ -49,8 +49,8 @@ public class GotoHTMLAction extends CookieAction {
      * Enable this action only if Wicket framework is added to this project and
      * the selected Java file has a HTML counterpart.
      *
-     * @param activatedNodes
-     * @return
+     * @param activatedNodes The currently active nodes
+     * @return True, if this action should be enabled.
      */
     @Override
     protected boolean enable(Node activatedNodes[]) {
