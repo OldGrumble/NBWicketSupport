@@ -51,7 +51,9 @@ import org.netbeans.modules.editor.NbEditorUtilities;
 import org.netbeans.modules.web.wicket.tree.HtmlTreeBuilder;
 import org.netbeans.modules.web.wicket.tree.JavaTreeBuilder;
 import org.netbeans.modules.web.wicket.tree.MarkupContainerTree;
-import org.netbeans.modules.web.wicket.tree.TreeDiff;
+import org.netbeans.modules.web.wicket.tree.Node;
+import org.netbeans.modules.web.wicket.tree.finders.TreeCallback;
+import org.netbeans.modules.web.wicket.tree.util.TreeDiff;
 import org.netbeans.modules.web.wicket.util.WicketSupportConstants;
 import org.openide.cookies.EditorCookie;
 import org.openide.cookies.LineCookie;
@@ -74,8 +76,13 @@ public final class WicketProblemAnnotationProvider implements AnnotationProvider
     private static final String WICKET_PROBLEM_SCANNING_RESULT = "wicket.problem_scaning.result";
     private static final RequestProcessor REQUEST_PROCESSOR;
 
+    static {
+        ERR.setLevel(Level.FINEST);
+        REQUEST_PROCESSOR = new RequestProcessor("Wicket Java and Html Annotation Parser", 2);
+    }
+
     private final WeakHashMap<FileObject, Collection<Annotation>> file2annotation = new WeakHashMap();
-    private final List<ListenerCacheEntry> cache = new LinkedList<>();
+    private final List<DocumentListenerCacheEntry> cache = new LinkedList<>();
 
     public WicketProblemAnnotationProvider() {
         ERR.log(Level.FINEST, "AnnotationProvider created");
@@ -215,55 +222,55 @@ public final class WicketProblemAnnotationProvider implements AnnotationProvider
         ArrayList<Annotation> javaAnns = new ArrayList<>();
         TreeDiff diff = new TreeDiff(htree, jtree);
         List<TreeDiff.Problem> problems = diff.getProblems();
-        block8:
         for (TreeDiff.Problem problem : problems) {
             String problemText = (Object)((Object)problem.getKind()) + ":" + problem;
-            MarkupContainerTree.Node<String> javaNode;
-            MarkupContainerTree.Node<String> node;
+            Node<String> javaNode;
+            Node<String> node;
             int offset;
             switch (problem.getKind()) {
                 case HTML_NODE_MISSING: {
                     node = problem.getProblemParentHtmlNode();
                     offset = node.getOffset();
                     htmlAnns.add(this.annotate(htmlDoc, htmlLines, offset, problemText, html));
-                    continue block8;
+                    break;
                 }
                 case HTML_NODE_ADDED:
                 case DUPLICATE_HTML_IDS: {
                     node = problem.getProblemHtmlNode();
                     offset = node.getOffset();
                     htmlAnns.add(this.annotate(htmlDoc, htmlLines, offset, problemText, html));
-                    continue block8;
+                    break;
                 }
                 case DIFFERENT_IDS: {
-                    MarkupContainerTree.Node<String> htmlNode = problem.getProblemHtmlNode();
+                    Node<String> htmlNode = problem.getProblemHtmlNode();
                     offset = htmlNode.getOffset();
                     htmlAnns.add(this.annotate(htmlDoc, htmlLines, offset, problemText, html));
-                    MarkupContainerTree.Node<String> javaNode2 = problem.getProblemJavaNode();
+                    Node<String> javaNode2 = problem.getProblemJavaNode();
                     offset = javaNode2.getOffset();
                     javaAnns.add(this.annotate(javaDoc, javaLines, offset, problemText, java));
-                    continue block8;
+                    break;
                 }
                 case JAVA_NODE_ADDED: {
                     javaNode = problem.getProblemJavaNode();
                     offset = javaNode.getOffset();
                     javaAnns.add(this.annotate(javaDoc, javaLines, offset, problemText, java));
-                    continue block8;
+                    break;
                 }
                 case JAVA_NODE_MISSING: {
                     javaNode = problem.getProblemParentHtmlNode();
                     offset = javaNode.getOffset();
                     javaAnns.add(this.annotate(javaDoc, javaLines, offset, problemText, java));
-                    continue block8;
+                    break;
                 }
                 case DUPLICATE_JAVA_IDS: {
                     javaNode = problem.getProblemParentJavaNode();
                     offset = javaNode.getOffset();
                     javaAnns.add(this.annotate(javaDoc, javaLines, offset, problemText, java));
-                    continue block8;
+                    break;
                 }
+                default:
+                    throw new AssertionError((Object)problem.getKind().name());
             }
-            throw new AssertionError((Object)problem.getKind().name());
         }
         if (!htmlAnns.isEmpty()) {
             this.file2annotation.put(html, htmlAnns);
@@ -295,9 +302,9 @@ public final class WicketProblemAnnotationProvider implements AnnotationProvider
 
     private synchronized boolean startListeningTo(FileObject html, FileObject java, Document htmlDoc, Document javaDoc) {
         boolean notResult = false;
-        Iterator<ListenerCacheEntry> i = this.cache.iterator();
+        Iterator<DocumentListenerCacheEntry> i = this.cache.iterator();
         while (i.hasNext()) {
-            ListenerCacheEntry l = i.next();
+            DocumentListenerCacheEntry l = i.next();
             if (l.isDead()) {
                 if (ERR.isLoggable(Level.FINE)) {
                     ERR.log(Level.FINE, "Disposing {0} - both files it listened to are gone", l);
@@ -308,22 +315,13 @@ public final class WicketProblemAnnotationProvider implements AnnotationProvider
             notResult |= l.isListeningTo(java) || l.isListeningTo(html);
         }
         if (!notResult) {
-            ListenerCacheEntry entry = new ListenerCacheEntry(html, java, htmlDoc, javaDoc);
+            DocumentListenerCacheEntry entry = new DocumentListenerCacheEntry(html, java, htmlDoc, javaDoc);
             this.cache.add(entry);
         }
         return !notResult;
     }
 
-    static /* synthetic */ RequestProcessor access$600() {
-        return REQUEST_PROCESSOR;
-    }
-
-    static {
-        ERR.setLevel(Level.FINEST);
-        REQUEST_PROCESSOR = new RequestProcessor("Wicket Java and Html Annotation Parser", 2);
-    }
-
-    private class ListenerCacheEntry {
+    private class DocumentListenerCacheEntry {
 
         private Reference<DataObject> htmld;
         private Reference<DataObject> javad;
@@ -331,7 +329,7 @@ public final class WicketProblemAnnotationProvider implements AnnotationProvider
         private Reference<ScanningDocumentListener> javal;
         private String refString;
 
-        ListenerCacheEntry(FileObject html, FileObject java, Document htmlDoc, Document javaDoc) {
+        DocumentListenerCacheEntry(FileObject html, FileObject java, Document htmlDoc, Document javaDoc) {
             try {
                 DataObject htmldob = DataObject.find((FileObject)html);
                 DataObject javadob = DataObject.find((FileObject)java);
@@ -390,11 +388,10 @@ public final class WicketProblemAnnotationProvider implements AnnotationProvider
 
         boolean isListeningTo(FileObject file) {
             try {
-                boolean result;
                 DataObject dob = DataObject.find((FileObject)file);
                 DataObject hdob = this.htmld == null ? null : this.htmld.get();
                 DataObject jdob = this.javad == null ? null : this.javad.get();
-                boolean bl = result = dob == hdob || dob == jdob;
+                boolean result = dob == hdob || dob == jdob;
                 if (!result && hdob == null != (jdob == null)) {
                     if (hdob == null && WicketSupportConstants.MIME_TYPE_HTML.equals(dob.getPrimaryFile().getMIMEType())) {
                         if (file.equals((Object)JavaForMarkupQuery.find(jdob.getPrimaryFile()))) {
@@ -417,18 +414,16 @@ public final class WicketProblemAnnotationProvider implements AnnotationProvider
             }
         }
 
+        @SuppressWarnings("null")
         private boolean isDead() {
-            boolean result;
-            DataObject hdob = this.htmld == null ? null : this.htmld.get();
-            DataObject jdob = this.javad == null ? null : this.javad.get();
-            boolean bl = result = hdob == null && jdob == null;
-            if (!(result || hdob != null && hdob.isValid() || jdob != null && jdob.isValid())) {
-                result = true;
-            } else if (hdob == null != (jdob == null)) {
-                FileObject otherFile;
-                FileObject fileObject = otherFile = hdob == null ? jdob.getPrimaryFile() : hdob.getPrimaryFile();
+            DataObject htmlDob = getValidDataObject(htmld);
+            DataObject javaDob = getValidDataObject(javad);
+            if (htmlDob != null && javaDob != null) {
+                return false;
+            } else if (htmlDob != null || javaDob != null) {
+                // This line causes an NPE warning, though NPE not possible
+                FileObject otherFile = htmlDob == null ? javaDob.getPrimaryFile() : htmlDob.getPrimaryFile();
                 if (otherFile.isValid()) {
-                    result = false;
                     try {
                         FileObject nue;
                         if (WicketSupportConstants.MIME_TYPE_HTML.equals(otherFile.getMIMEType())) {
@@ -444,20 +439,22 @@ public final class WicketProblemAnnotationProvider implements AnnotationProvider
                     } catch (IOException ioe) {
                         Exceptions.printStackTrace((Throwable)ioe);
                     }
-                } else {
-                    return true;
+                    return false;
                 }
             }
-            return result;
+            return true;
+        }
+
+        private DataObject getValidDataObject(Reference<DataObject> refDobj) {
+            DataObject dObj = refDobj == null ? null : refDobj.get();
+            return (dObj != null && dObj.isValid()) ? dObj : null;
         }
     }
 
-    private class ScanningDocumentListener
-            implements DocumentListener,
-            Runnable {
+    private class ScanningDocumentListener implements DocumentListener, Runnable {
 
         private static final int AUTO_SCANNING_DELAY = 2000;
-        private final RequestProcessor.Task parseTask = WicketProblemAnnotationProvider.access$600().create((Runnable)this);
+        private final RequestProcessor.Task parseTask = WicketProblemAnnotationProvider.REQUEST_PROCESSOR.create((Runnable)this);
         private boolean java;
         private Reference<DataObject> dobref;
         private String debugData;
@@ -513,7 +510,7 @@ public final class WicketProblemAnnotationProvider implements AnnotationProvider
 
         private void restartTimer() {
             ERR.log(Level.FINEST, "restart timer on {0}", this);
-            this.parseTask.schedule(2000);
+            parseTask.schedule(AUTO_SCANNING_DELAY);
         }
 
         @Override
@@ -522,7 +519,7 @@ public final class WicketProblemAnnotationProvider implements AnnotationProvider
             if (dob != null) {
                 Line.Set set;
                 boolean done = false;
-                ERR.log(Level.FINE, "Reparse file " + dob.getPrimaryFile().getPath());
+                ERR.log(Level.FINE, "Reparse file {0}", dob.getPrimaryFile().getPath());
                 LineCookie ck = (LineCookie)dob.getLookup().lookup(LineCookie.class);
                 if (ck != null && (set = ck.getLineSet()) != null) {
                     WicketProblemAnnotationProvider.this.annotate(set, dob.getPrimaryFile());
@@ -535,9 +532,9 @@ public final class WicketProblemAnnotationProvider implements AnnotationProvider
         }
     }
 
-    private static class TCB implements JavaTreeBuilder.TreeCallback {
+    private static class TCB implements TreeCallback {
 
-        private MarkupContainerTree<String> tree;
+        MarkupContainerTree<String> tree;
 
         private TCB() {
         }

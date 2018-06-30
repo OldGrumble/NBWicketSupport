@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
 OpenIDE-Module-Layer: org/netbeans/modules/web/wicket/resources/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/web/wicket/Bundle.properties
-
+OpenIDE-Module: org.netbeans.modules.web.wicket
+OpenIDE-Module-Name: web.wicket
