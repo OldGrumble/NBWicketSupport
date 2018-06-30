@@ -69,6 +69,7 @@ public final class JavaTreeBuilder {
         this.analyze(t, null, false);
     }
 
+    @SuppressWarnings("null")
     public void analyze(TreeCallback t, Collection<ProblemFinderVisitor> visitors, boolean immediate) {
         try {
             JavaSource src;
@@ -113,6 +114,7 @@ public final class JavaTreeBuilder {
             JavaTreeBuilder.this.problems = visitors == null ? null : new HashSet();
         }
 
+        @Override
         public void run(CompilationController cc) throws Exception {
             cc.toPhase(JavaSource.Phase.RESOLVED);
             TypeElement markupContainerType = cc.getElements().getTypeElement("org.apache.wicket.MarkupContainer");
@@ -120,7 +122,7 @@ public final class JavaTreeBuilder {
                 System.err.println("Wicket not found on classpath");
                 return;
             }
-            ArrayList<? extends Tree> types = new ArrayList<Tree>(cc.getCompilationUnit().getTypeDecls());
+            ArrayList<? extends Tree> types = new ArrayList<>(cc.getCompilationUnit().getTypeDecls());
             Iterator<? extends Tree> it = types.iterator();
             while (it.hasNext()) {
                 Tree tree = it.next();
@@ -128,13 +130,13 @@ public final class JavaTreeBuilder {
                 if (tree instanceof ClassTree && Utils.isWebMarkupContainer(mirror, cc.getTypes())) continue;
                 it.remove();
             }
-            HashMap<String, MarkupContainerTree.N<String>> nodes = new HashMap<String, MarkupContainerTree.N<String>>();
+            HashMap<String, MarkupContainerTree.N<String>> nodes = new HashMap<>();
             MarkupContainerTree<String> result = null;
             HashMap invocations = new HashMap();
             HashMap types2ids = new HashMap();
             for (Tree tree : types) {
                 if (result == null) {
-                    result = new MarkupContainerTree<>(new MarkupContainerTree.N<String>("root", null, 0, null));
+                    result = new MarkupContainerTree<>(new MarkupContainerTree.N<>("root", null, 0, null));
                 }
                 if (!this.visitors.isEmpty()) {
                     for (ProblemFinderVisitor v : this.visitors) {
@@ -191,12 +193,12 @@ public final class JavaTreeBuilder {
                     String pid = parentIds == null || parentIds.isEmpty() ? null : JavaTreeBuilder.unquote((String)parentIds.get(0));
                     System.err.println(childIds + " added to " + parentIds);
                     System.err.println(inv.getArgument() + " added to " + inv.getTarget());
-                    MarkupContainerTree.N<String> n = new MarkupContainerTree.N<String>(cid, null, (int)inv.getStart(), cid);
+                    MarkupContainerTree.N<String> n = new MarkupContainerTree.N<>(cid, null, (int)inv.getStart(), cid);
                     nodes.put(cid, n);
                     if (pid == null) continue;
                     MarkupContainerTree.N<String> parNode = (MarkupContainerTree.N<String>)nodes.get(pid);
                     if (parNode == null) {
-                        parNode = new MarkupContainerTree.N<String>(pid, null, (int)inv.getStart(), cid);
+                        parNode = new MarkupContainerTree.N<>(pid, null, (int)inv.getStart(), cid);
                         nodes.put(pid, parNode);
                     }
                     parNode.add(n);
