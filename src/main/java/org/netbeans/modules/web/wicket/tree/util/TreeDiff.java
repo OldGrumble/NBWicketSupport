@@ -15,8 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.modules.web.wicket.tree.MarkupContainerTree;
 import org.netbeans.modules.web.wicket.tree.Node;
-import org.netbeans.modules.web.wicket.tree.borrowed.Change;
-import org.netbeans.modules.web.wicket.tree.borrowed.Diff;
+import org.netbeans.modules.web.wicket.tree.diff.Change;
+import org.netbeans.modules.web.wicket.tree.diff.Diff;
 import org.openide.util.NbBundle;
 
 public final class TreeDiff {
@@ -31,7 +31,7 @@ public final class TreeDiff {
     }
 
     public List<Problem> getProblems() {
-        ArrayList<Problem> problems = new ArrayList<Problem>();
+        ArrayList<Problem> problems = new ArrayList<>();
         this.diff(this.html.getRoot(), this.java.getRoot(), problems);
         return problems;
     }
@@ -89,7 +89,7 @@ public final class TreeDiff {
                         p2 = new Problem(ProblemKind.JAVA_NODE_ADDED, javaNode.getChildren().get(i), null, javaNode, htmlNode);
                         problems.add(p2);
                     }
-                    continue block8;
+                    continue;
                 }
                 case 2: {
                     for (int i = start; i <= end; ++i) {
@@ -98,7 +98,7 @@ public final class TreeDiff {
                         p2 = new Problem(ProblemKind.HTML_NODE_ADDED, null, htmlNode.getChildren().get(i), javaNode, htmlNode);
                         problems.add(p2);
                     }
-                    continue block8;
+                    continue;
                 }
                 case 0: {
                     for (int i = start; i <= end; ++i) {
@@ -112,8 +112,8 @@ public final class TreeDiff {
     }
 
     private List<Node<String>> findDuplicateIds(Node<String> parent) {
-        HashSet<String> dupCheck = new HashSet<String>();
-        ArrayList<Node<String>> result = new ArrayList<Node<String>>();
+        HashSet<String> dupCheck = new HashSet<>();
+        ArrayList<Node<String>> result = new ArrayList<>();
         for (Node<String> child : parent.getChildren()) {
             if (dupCheck.contains(child.getId())) {
                 result.add(child);
@@ -124,8 +124,8 @@ public final class TreeDiff {
     }
 
     private List<String> getChildNodesIds(Node<String> n) {
-        ArrayList<String> result = new ArrayList<String>(n.getChildren().size());
-        ArrayList<Node<String>> kids = new ArrayList<Node<String>>(n.getChildren());
+        ArrayList<String> result = new ArrayList<>(n.getChildren().size());
+        ArrayList<Node<String>> kids = new ArrayList<>(n.getChildren());
         Collections.sort(kids);
         for (Node<String> child : kids) {
             result.add(child.getId());
@@ -170,6 +170,7 @@ public final class TreeDiff {
             return this.problemParentJavaNode;
         }
 
+        @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
             switch (this.getKind()) {
@@ -221,11 +222,11 @@ public final class TreeDiff {
                 }
             }
             if (ERR.isLoggable(Level.FINE)) {
-                sb.append("\n  problemJavaNode " + this.problemJavaNode);
-                sb.append("\n  problemJavaParent " + this.problemParentJavaNode);
-                sb.append("\n  problemHtmlNode " + this.problemHtmlNode);
-                sb.append("\n  problemHtmlParent " + this.problemParentHtmlNode);
-                sb.append(")");
+                sb.append("\n  problemJavaNode ").append(this.problemJavaNode)
+                        .append("\n  problemJavaParent ").append(this.problemParentJavaNode)
+                        .append("\n  problemHtmlNode ").append(this.problemHtmlNode)
+                        .append("\n  problemHtmlParent ").append(this.problemParentHtmlNode)
+                        .append(")");
             }
             return sb.toString();
         }
