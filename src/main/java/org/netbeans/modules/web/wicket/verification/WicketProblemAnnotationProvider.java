@@ -1,28 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.project.FileOwnerQuery
- *  org.netbeans.api.project.Project
- *  org.netbeans.lib.editor.util.swing.DocumentListenerPriority
- *  org.netbeans.lib.editor.util.swing.DocumentUtilities
- *  org.netbeans.modules.editor.NbEditorUtilities
- *  org.openide.cookies.EditorCookie
- *  org.openide.cookies.LineCookie
- *  org.openide.filesystems.FileObject
- *  org.openide.loaders.DataObject
- *  org.openide.loaders.DataObjectNotFoundException
- *  org.openide.nodes.Node
- *  org.openide.nodes.Node$Cookie
- *  org.openide.text.Annotatable
- *  org.openide.text.Annotation
- *  org.openide.text.AnnotationProvider
- *  org.openide.text.Line
- *  org.openide.text.Line$Set
- *  org.openide.util.Exceptions
- *  org.openide.util.Lookup
- *  org.openide.util.RequestProcessor
- *  org.openide.util.RequestProcessor$Task
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.verification;
 
@@ -69,6 +46,10 @@ import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
+/**
+ * 
+ * @author Tim Boudreau
+ */
 @ServiceProvider(service = AnnotationProvider.class)
 public final class WicketProblemAnnotationProvider implements AnnotationProvider {
 

@@ -1,26 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.project.FileOwnerQuery
- *  org.netbeans.api.project.Project
- *  org.netbeans.modules.refactoring.api.AbstractRefactoring
- *  org.netbeans.modules.refactoring.api.MultipleCopyRefactoring
- *  org.netbeans.modules.refactoring.api.Problem
- *  org.netbeans.modules.refactoring.api.SingleCopyRefactoring
- *  org.netbeans.modules.refactoring.spi.RefactoringElementImplementation
- *  org.netbeans.modules.refactoring.spi.RefactoringElementsBag
- *  org.netbeans.modules.refactoring.spi.RefactoringPlugin
- *  org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation
- *  org.openide.ErrorManager
- *  org.openide.filesystems.FileLock
- *  org.openide.filesystems.FileObject
- *  org.openide.filesystems.FileUtil
- *  org.openide.filesystems.URLMapper
- *  org.openide.text.PositionBounds
- *  org.openide.util.Exceptions
- *  org.openide.util.Lookup
- *  org.openide.util.NbBundle
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.refactoring;
 
@@ -43,7 +22,6 @@ import org.netbeans.modules.refactoring.spi.RefactoringElementImplementation;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;
-import org.netbeans.modules.web.wicket.refactoring.WicketRenameRefactoringPlugin;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
@@ -54,10 +32,15 @@ import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public class WicketCopyClassRefactoringPlugin implements RefactoringPlugin {
 
     private static final ErrorManager ERR = ErrorManager.getDefault().getInstance("org.netbeans.modules.web.wicket.refactoring");
-    private AbstractRefactoring refactoring;
+
+    private final AbstractRefactoring refactoring;
 
     public WicketCopyClassRefactoringPlugin(SingleCopyRefactoring refactoring) {
         this.refactoring = refactoring;
@@ -67,18 +50,22 @@ public class WicketCopyClassRefactoringPlugin implements RefactoringPlugin {
         this.refactoring = refactoring;
     }
 
+    @Override
     public Problem preCheck() {
         return null;
     }
 
+    @Override
     public Problem checkParameters() {
         return null;
     }
 
+    @Override
     public Problem fastCheckParameters() {
         return null;
     }
 
+    @Override
     public void cancelRequest() {
     }
 
@@ -116,7 +103,7 @@ public class WicketCopyClassRefactoringPlugin implements RefactoringPlugin {
                 return new Problem(true, NbBundle.getMessage(WicketCopyClassRefactoringPlugin.class, (String)"not_folder"));
             }
             Collection<? extends FileObject> toCopy = this.refactoring.getRefactoringSource().lookupAll(FileObject.class);
-            HashSet<String> used = new HashSet<String>();
+            HashSet<String> used = new HashSet<>();
             String name = this.getNewName();
             for (FileObject javaFile : toCopy) {
                 FileObject markup = MarkupForJavaQuery.find(javaFile);
@@ -164,6 +151,7 @@ public class WicketCopyClassRefactoringPlugin implements RefactoringPlugin {
             return this.newName == null ? this.foHtml.getName() : this.newName;
         }
 
+        @Override
         public void performChange() {
             ERR.log("Perform copying");
             try {
@@ -175,6 +163,7 @@ public class WicketCopyClassRefactoringPlugin implements RefactoringPlugin {
             }
         }
 
+        @Override
         public void undoChange() {
             ERR.log("Perform moving undo");
             FileLock fileLock = null;
@@ -190,6 +179,7 @@ public class WicketCopyClassRefactoringPlugin implements RefactoringPlugin {
             }
         }
 
+        @Override
         public String getText() {
             if (this.oldFolder.equals((Object)this.newFolder)) {
                 return NbBundle.getMessage(WicketCopyClassRefactoringPlugin.class, (String)"lbl_copy_simple", (Object)this.foHtml.getNameExt(), (Object)this.newFolder.getName());
@@ -197,18 +187,22 @@ public class WicketCopyClassRefactoringPlugin implements RefactoringPlugin {
             return NbBundle.getMessage(WicketCopyClassRefactoringPlugin.class, (String)"lbl_copy", (Object)this.foHtml.getNameExt(), (Object)this.getNewName(), (Object)this.newFolder.getName());
         }
 
+        @Override
         public String getDisplayText() {
             return MessageFormat.format(NbBundle.getMessage(WicketRenameRefactoringPlugin.class, (String)"TXT_WicketHtmlMove"), this.foHtml.getName() + "." + this.foHtml.getExt(), this.newFolder.getPath());
         }
 
+        @Override
         public FileObject getParentFile() {
             return this.foHtml;
         }
 
+        @Override
         public PositionBounds getPosition() {
             return null;
         }
 
+        @Override
         public Lookup getLookup() {
             return Lookup.EMPTY;
         }

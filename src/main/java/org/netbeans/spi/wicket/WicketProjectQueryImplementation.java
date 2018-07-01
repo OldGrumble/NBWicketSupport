@@ -1,9 +1,12 @@
-// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.geocities.com/kpdus/jad.html
-// Decompiler options: packimports(3) lnc 
-// Source File Name:   WicketProjectQueryImplementation.java
+/*
+ * Not ready for public use, so <b>don't use it</b>, yet.
+ */
 package org.netbeans.spi.wicket;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 import org.netbeans.api.project.Project;
 
 public interface WicketProjectQueryImplementation {

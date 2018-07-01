@@ -1,16 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.openide.cookies.EditorCookie
- *  org.openide.filesystems.FileObject
- *  org.openide.loaders.DataObject
- *  org.openide.nodes.Node
- *  org.openide.util.Exceptions
- *  org.openide.util.HelpCtx
- *  org.openide.util.Lookup
- *  org.openide.util.NbBundle
- *  org.openide.util.actions.CookieAction
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.util;
 
@@ -37,6 +26,10 @@ import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.CookieAction;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 @ActionID(id = "org.netbeans.modules.web.wicket.tree.SomeAction", category = "BpelNodes")
 @ActionRegistration(displayName = "SomeAction", lazy = false)
 @ActionReferences(value = {

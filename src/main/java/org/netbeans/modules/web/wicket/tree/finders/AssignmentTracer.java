@@ -1,6 +1,5 @@
 /*
- * Some license issues have still to be clarified, especially for the "borrowed"
- * package, so <b>don't use it</b>, yet.
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.finders;
 
@@ -18,6 +17,10 @@ import java.util.Set;
 import javax.lang.model.element.Element;
 import org.netbeans.api.java.source.CompilationController;
 
+/**
+ * 
+ * @author Tim Boudreau
+ */
 final class AssignmentTracer extends TreeScanner<Void, Set<NewClassTree>> {
 
     private final CompilationController cc;

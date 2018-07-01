@@ -1,37 +1,14 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.java.classpath.ClassPath
- *  org.netbeans.api.project.Project
- *  org.netbeans.api.project.ProjectUtils
- *  org.netbeans.api.project.SourceGroup
- *  org.netbeans.spi.java.project.support.ui.templates.JavaTemplates
- *  org.netbeans.spi.project.ui.templates.support.Templates
- *  org.openide.WizardDescriptor
- *  org.openide.WizardDescriptor$Panel
- *  org.openide.cookies.EditorCookie
- *  org.openide.cookies.SaveCookie
- *  org.openide.filesystems.FileObject
- *  org.openide.loaders.DataFolder
- *  org.openide.loaders.DataObject
- *  org.openide.loaders.TemplateWizard
- *  org.openide.loaders.TemplateWizard$Iterator
- *  org.openide.nodes.Node
- *  org.openide.nodes.Node$Cookie
- *  org.openide.util.NbBundle
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.template.filelevel;
 
-import java.awt.Component;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
@@ -39,8 +16,6 @@ import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
-import org.netbeans.modules.web.wicket.template.filelevel.WicketBorderPanel;
-import org.netbeans.modules.web.wicket.template.filelevel.WicketPageIterator;
 import org.netbeans.spi.java.project.support.ui.templates.JavaTemplates;
 import org.netbeans.spi.project.ui.templates.support.Templates;
 import org.openide.WizardDescriptor;
@@ -50,16 +25,20 @@ import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataFolder;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.TemplateWizard;
-import org.openide.nodes.Node;
 import org.openide.util.NbBundle;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public class WicketBorderIterator implements TemplateWizard.Iterator {
 
-    private int index;
-    private transient WizardDescriptor.Panel[] panels;
-    private transient boolean debug = false;
     private static String htmltext = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n<html>\n  <head>\n    <title></title>\n  </head>\n  <body>\n     <wicket:border>\n        <p>\n           <table>\n              <tr>\n                 <td>\n                     <span wicket:id = \"bodyBorder\">\n                          <wicket:body/>\n                     </span>\n                 </td>\n              </tr>\n           </table>\n        </p>\n     </wicket:border>\n  </body>\n</html>";
     private static String javatext = "/*\n * __CLASS__.java\n *\n * Created on March 19, 2006, 1:13 PM\n *\n */\n\npackage __PACKAGE__;\n\nimport __FULL_SUPERCLASS__;\nimport org.apache.wicket.markup.html.border.BoxBorder;\n\npublic class __CLASS__ extends __SUPERCLASS__ {\n\n    /** Creates a new instance of __CLASS__ */\n    public __CLASS__(String id) {\n        super(id);\n        add(new BoxBorder(\"bodyBorder\"));\n    }\n\n}";
+
+    private final transient boolean debug = false;
+    private transient WizardDescriptor.Panel[] panels;
+    private int index;
 
     public static WicketBorderIterator createIterator() {
         return new WicketBorderIterator();

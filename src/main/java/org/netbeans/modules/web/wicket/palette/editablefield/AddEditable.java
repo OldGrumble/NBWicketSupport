@@ -1,30 +1,14 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.java.source.CompilationInfo
- *  org.netbeans.api.java.source.JavaSource
- *  org.netbeans.api.java.source.JavaSource$Phase
- *  org.netbeans.api.java.source.ModificationResult
- *  org.netbeans.api.java.source.Task
- *  org.netbeans.api.java.source.TreeMaker
- *  org.netbeans.api.java.source.WorkingCopy
- *  org.openide.util.Exceptions
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.palette.editablefield;
 
-import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
 import com.sun.source.util.TreePathScanner;
-import com.sun.source.util.Trees;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -40,9 +24,13 @@ import org.netbeans.api.java.source.TreeMaker;
 import org.netbeans.api.java.source.WorkingCopy;
 import org.openide.util.Exceptions;
 
-public class AddEditable        extends TreePathScanner<Void, Void> {
+/**
+ *
+ * @author Tim Boudreau
+ */
+public class AddEditable extends TreePathScanner<Void, Void> {
 
-    private CompilationInfo info;
+    private final CompilationInfo info;
     private final JavaSource source;
     private final String wicketId;
     private final String initValue;
@@ -69,15 +57,15 @@ public class AddEditable        extends TreePathScanner<Void, Void> {
                 final MethodTree constructor = this.info.getTrees().getTree(exe);
                 Task<WorkingCopy> task1 = new Task<WorkingCopy>() {
 
+                    @Override
                     public void run(WorkingCopy workingCopy) throws IOException {
                         workingCopy.toPhase(JavaSource.Phase.PARSED);
-                        workingCopy.rewrite((Tree)constructor.getBody(), (Tree)workingCopy.getTreeMaker().addBlockStatement(constructor.getBody(), (StatementTree)AddEditable.this.getVariableTree2(workingCopy)));
+                        workingCopy.rewrite((Tree)constructor.getBody(), workingCopy.getTreeMaker().addBlockStatement(constructor.getBody(), AddEditable.this.getVariableTree2(workingCopy)));
                     }
                 };
                 try {
-                    ModificationResult result = this.source.runModificationTask((Task)task1);
+                    ModificationResult result = this.source.runModificationTask(task1);
                     result.commit();
-                    continue;
                 } catch (IOException ex) {
                     Exceptions.printStackTrace((Throwable)ex);
                 }

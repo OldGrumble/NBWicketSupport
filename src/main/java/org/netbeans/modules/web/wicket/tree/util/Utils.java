@@ -1,27 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.java.source.CancellableTask
- *  org.netbeans.api.java.source.ClassIndex
- *  org.netbeans.api.java.source.ClassIndex$SearchKind
- *  org.netbeans.api.java.source.ClassIndex$SearchScope
- *  org.netbeans.api.java.source.ClasspathInfo
- *  org.netbeans.api.java.source.CompilationController
- *  org.netbeans.api.java.source.CompilationInfo
- *  org.netbeans.api.java.source.ElementHandle
- *  org.netbeans.api.java.source.ElementUtilities
- *  org.netbeans.api.java.source.JavaSource
- *  org.netbeans.api.java.source.JavaSource$Phase
- *  org.netbeans.api.java.source.SourceUtils
- *  org.netbeans.api.java.source.Task
- *  org.netbeans.api.java.source.TreeMaker
- *  org.netbeans.api.java.source.TreePathHandle
- *  org.netbeans.api.java.source.TreeUtilities
- *  org.netbeans.api.java.source.TypeMirrorHandle
- *  org.netbeans.api.java.source.WorkingCopy
- *  org.openide.filesystems.FileObject
- *  org.openide.util.Exceptions
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.util;
 
@@ -82,6 +60,10 @@ import org.netbeans.api.java.source.WorkingCopy;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 
+/**
+ * 
+ * @author Tim Boudreau
+ */
 public final class Utils {
 
     public static List<TypeMirror> toTypeMirrors(Iterable<? extends TypeMirrorHandle> types, CompilationInfo info) {

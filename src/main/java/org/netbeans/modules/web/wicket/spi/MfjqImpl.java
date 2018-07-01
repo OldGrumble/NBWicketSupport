@@ -1,8 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.openide.filesystems.FileObject
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.spi;
 
@@ -10,6 +7,10 @@ import org.netbeans.spi.wicket.MarkupForJavaQueryImplementation;
 import org.openide.filesystems.FileObject;
 import org.openide.util.lookup.ServiceProvider;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 @ServiceProvider(service = MarkupForJavaQueryImplementation.class, position = 10)
 public class MfjqImpl implements MarkupForJavaQueryImplementation {
 

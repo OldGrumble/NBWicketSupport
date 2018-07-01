@@ -1,24 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.project.FileOwnerQuery
- *  org.netbeans.api.project.Project
- *  org.netbeans.modules.refactoring.api.AbstractRefactoring
- *  org.netbeans.modules.refactoring.api.MoveRefactoring
- *  org.netbeans.modules.refactoring.api.Problem
- *  org.netbeans.modules.refactoring.spi.RefactoringElementImplementation
- *  org.netbeans.modules.refactoring.spi.RefactoringElementsBag
- *  org.netbeans.modules.refactoring.spi.RefactoringPlugin
- *  org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation
- *  org.openide.ErrorManager
- *  org.openide.filesystems.FileLock
- *  org.openide.filesystems.FileObject
- *  org.openide.filesystems.FileUtil
- *  org.openide.filesystems.URLMapper
- *  org.openide.text.PositionBounds
- *  org.openide.util.Lookup
- *  org.openide.util.NbBundle
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.refactoring;
 
@@ -40,8 +21,6 @@ import org.netbeans.modules.refactoring.spi.RefactoringElementImplementation;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;
-import org.netbeans.modules.web.wicket.refactoring.WicketCopyClassRefactoringPlugin;
-import org.netbeans.modules.web.wicket.refactoring.WicketRenameRefactoringPlugin;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
@@ -51,10 +30,15 @@ import org.openide.text.PositionBounds;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public class WicketMoveClassRefactoringPlugin implements RefactoringPlugin {
 
     private static final ErrorManager ERR = ErrorManager.getDefault().getInstance("org.netbeans.modules.web.wicket.refactoring");
-    private MoveRefactoring refactoring;
+
+    private final MoveRefactoring refactoring;
 
     public WicketMoveClassRefactoringPlugin(MoveRefactoring refactoring) {
         this.refactoring = refactoring;
@@ -75,9 +59,11 @@ public class WicketMoveClassRefactoringPlugin implements RefactoringPlugin {
         return null;
     }
 
+    @Override
     public void cancelRequest() {
     }
 
+    @Override
     public Problem prepare(RefactoringElementsBag bag) {
         try {
             ERR.log("Prepare moving: ");
@@ -103,7 +89,7 @@ public class WicketMoveClassRefactoringPlugin implements RefactoringPlugin {
                 return new Problem(true, NbBundle.getMessage(WicketMoveClassRefactoringPlugin.class, (String)"not_folder"));
             }
             Collection<? extends FileObject> toMove = this.refactoring.getRefactoringSource().lookupAll(FileObject.class);
-            HashSet<String> used = new HashSet<String>();
+            HashSet<String> used = new HashSet<>();
             for (FileObject javaFile : toMove) {
                 FileObject markup = MarkupForJavaQuery.find(javaFile);
                 if (markup == null || used.contains(markup.getPath())) {
@@ -126,12 +112,11 @@ public class WicketMoveClassRefactoringPlugin implements RefactoringPlugin {
         }
     }
 
-    public class HTMLMoveRefactoringElement
-            extends SimpleRefactoringElementImplementation {
+    public class HTMLMoveRefactoringElement extends SimpleRefactoringElementImplementation {
 
+        private final FileObject oldFolder;
+        private final FileObject newFolder;
         private FileObject foHtml;
-        private FileObject oldFolder;
-        private FileObject newFolder;
 
         HTMLMoveRefactoringElement(FileObject fo, FileObject newFolder, FileObject oldFolder) {
             this.foHtml = fo;
@@ -143,6 +128,7 @@ public class WicketMoveClassRefactoringPlugin implements RefactoringPlugin {
             ERR.log("newPath: " + (Object)newFolder);
         }
 
+        @Override
         public void performChange() {
             ERR.log("Perform moving");
             FileLock fileLock = null;
@@ -159,6 +145,7 @@ public class WicketMoveClassRefactoringPlugin implements RefactoringPlugin {
             }
         }
 
+        @Override
         public void undoChange() {
             ERR.log("Perform moving undo");
             FileLock fileLock = null;
@@ -175,25 +162,29 @@ public class WicketMoveClassRefactoringPlugin implements RefactoringPlugin {
             }
         }
 
+        @Override
         public String getText() {
             return NbBundle.getMessage(WicketCopyClassRefactoringPlugin.class, (String)"lbl_move", (Object)this.foHtml.getNameExt(), (Object)this.newFolder.getName());
         }
 
+        @Override
         public String getDisplayText() {
             return MessageFormat.format(NbBundle.getMessage(WicketRenameRefactoringPlugin.class, (String)"TXT_WicketHtmlMove"), this.foHtml.getName() + "." + this.foHtml.getExt(), this.newFolder.getPath());
         }
 
+        @Override
         public FileObject getParentFile() {
             return this.foHtml;
         }
 
+        @Override
         public PositionBounds getPosition() {
             return null;
         }
 
+        @Override
         public Lookup getLookup() {
             return Lookup.EMPTY;
         }
     }
-
 }

@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree;
 
@@ -17,7 +15,7 @@ import org.openide.util.Exceptions;
 
 /**
  *
- * @author peter
+ * @author Tim Boudreau
  */
 final class HTMLTagContentsParser {
 
@@ -167,7 +165,7 @@ final class HTMLTagContentsParser {
                         String txt2 = tok.text().toString();
                         Iterator<HtmlTreeBuilder.TagVisitor> iterator = visitors.iterator();
                         while (iterator.hasNext()) {
-                            curr  = iterator.next();
+                            curr = iterator.next();
                             curr.visitArgumentValue(txt2, ts.offset());
                         }
                         break;

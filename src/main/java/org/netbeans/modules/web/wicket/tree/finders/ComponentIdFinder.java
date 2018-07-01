@@ -1,6 +1,5 @@
 /*
- * Some license issues have still to be clarified, especially for the "borrowed"
- * package, so <b>don't use it</b>, yet.
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.finders;
 
@@ -24,6 +23,10 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.java.source.CompilationController;
 
+/**
+ * 
+ * @author Tim Boudreau
+ */
 public class ComponentIdFinder extends TreeScanner<Void, List<String>> {
 
     private final CompilationController cc;

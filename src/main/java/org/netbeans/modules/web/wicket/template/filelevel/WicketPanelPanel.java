@@ -1,30 +1,22 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.project.Project
- *  org.openide.WizardDescriptor
- *  org.openide.WizardDescriptor$FinishablePanel
- *  org.openide.WizardDescriptor$Panel
- *  org.openide.util.HelpCtx
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.template.filelevel;
 
 import java.awt.Component;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import javax.swing.ComboBoxEditor;
-import javax.swing.JComboBox;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.project.Project;
-import org.netbeans.modules.web.wicket.template.filelevel.WicketPagePanel;
-import org.netbeans.modules.web.wicket.template.filelevel.WicketPanelPanelVisual;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 final class WicketPanelPanel implements WizardDescriptor.Panel, WizardDescriptor.FinishablePanel {
 
     private WizardDescriptor wizardDescriptor;

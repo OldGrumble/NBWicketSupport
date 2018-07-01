@@ -1,6 +1,5 @@
 /*
- * Some license issues have still to be clarified, especially for the "borrowed"
- * package, so <b>don't use it</b>, yet.
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.finders;
 
@@ -16,7 +15,7 @@ import org.netbeans.modules.web.wicket.tree.util.Utils;
 /**
  * A TreeScanner implementation for collecting all constructor invocationss.
  *
- * @author Geertjan Wielenga
+ * @author Tim Boudreau
  */
 public class ComponentConstructorInvocationFinder extends TreeScanner<Void, Set<NewClassTree>> {
 

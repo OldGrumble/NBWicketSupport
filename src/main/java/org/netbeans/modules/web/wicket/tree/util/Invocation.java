@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.util;
 
@@ -8,6 +8,10 @@ import com.sun.source.tree.NewClassTree;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
 
+/**
+ * 
+ * @author Tim Boudreau
+ */
 public final class Invocation implements Comparable<Invocation> {
 
     private final MethodInvocationTree invocation;

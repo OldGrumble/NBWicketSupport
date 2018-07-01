@@ -1,6 +1,5 @@
 /*
- * Some license issues have still to be clarified, especially for the "borrowed"
- * package, so <b>don't use it</b>, yet.
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 /**
  * This package contains subclasses of {@link com.sun.source.util.TreeScanner}

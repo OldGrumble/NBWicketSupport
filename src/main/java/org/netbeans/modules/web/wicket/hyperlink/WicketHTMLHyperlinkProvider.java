@@ -1,6 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.hyperlink;
 
@@ -13,10 +12,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.html.lexer.HTMLTokenId;
-import org.netbeans.api.lexer.Language;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
-import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.wicket.JavaForMarkupQuery;
 import org.netbeans.editor.BaseDocument;
@@ -29,13 +26,17 @@ import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.util.Exceptions;
-import org.openide.util.Lookup;
 import org.openide.util.RequestProcessor;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public class WicketHTMLHyperlinkProvider implements HyperlinkProvider {
 
-    private static final ErrorManager err = ErrorManager.getDefault().getInstance("org.netbeans.modules.web.wicket.hyperlink");
-    private static String WICKET_IDENTIFIER = "wicket:id";
+    private static final ErrorManager ERR = ErrorManager.getDefault().getInstance("org.netbeans.modules.web.wicket.hyperlink");
+    private static final String WICKET_IDENTIFIER = "wicket:id";
+
     private Reference<Document> lastDocument = null;
     private int startOffset;
     private int endOffset;
@@ -48,7 +49,7 @@ public class WicketHTMLHyperlinkProvider implements HyperlinkProvider {
     public boolean isHyperlinkPoint(Document doc, int offset) {
         block16:
         {
-            err.log("isHyperlinkPoint() offset: " + offset);
+            ERR.log("isHyperlinkPoint() offset: " + offset);
             if (!(doc instanceof BaseDocument)) {
                 return false;
             }
@@ -87,12 +88,12 @@ public class WicketHTMLHyperlinkProvider implements HyperlinkProvider {
                                 }
                                 case OPERATOR: {
                                     operatorFound = true;
-                                    continue block13;
+                                    break;
                                 }
                                 case EOL:
                                 case ERROR:
                                 case WS: {
-                                    continue block13;
+                                    break;
                                 }
                                 default: {
                                     boolean bl = false;
@@ -136,6 +137,7 @@ public class WicketHTMLHyperlinkProvider implements HyperlinkProvider {
         return new int[]{this.startOffset, this.endOffset};
     }
 
+    @Override
     public void performClickAction(Document doc, int offset) {
         if (!(doc instanceof BaseDocument)) {
             return;
@@ -150,10 +152,9 @@ public class WicketHTMLHyperlinkProvider implements HyperlinkProvider {
         RequestProcessor.getDefault().post((Runnable)run);
     }
 
-    private class OpenJavaClassThread
-            implements Runnable {
+    private class OpenJavaClassThread implements Runnable {
 
-        private BaseDocument doc;
+        private final BaseDocument doc;
 
         public OpenJavaClassThread(BaseDocument doc) {
             this.doc = doc;

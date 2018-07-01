@@ -1,20 +1,8 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.project.Project
- *  org.openide.WizardDescriptor
- *  org.openide.util.HelpCtx
- *  org.openide.util.HelpCtx$Provider
- *  org.openide.util.NbBundle
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.template.filelevel;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.LayoutManager;
-import javax.swing.ComboBoxEditor;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
@@ -28,6 +16,10 @@ import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public class WicketPagePanelVisual extends JPanel implements HelpCtx.Provider, ListDataListener {
 
     public JComboBox jComboBoxSuperclass;
@@ -47,7 +39,7 @@ public class WicketPagePanelVisual extends JPanel implements HelpCtx.Provider, L
         this.jLabelSuperclass.setLabelFor(this.jComboBoxSuperclass);
         this.jLabelSuperclass.setText("Superclass:");
         this.jComboBoxSuperclass.setEditable(true);
-        this.jComboBoxSuperclass.setModel(new DefaultComboBoxModel<String>(new String[]{"org.apache.wicket.markup.html.WebPage"}));
+        this.jComboBoxSuperclass.setModel(new DefaultComboBoxModel<>(new String[]{"org.apache.wicket.markup.html.WebPage"}));
         this.jLabel1.setText("An HTML file and a Java source file will be created. The extension class is below.");
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
@@ -70,8 +62,9 @@ public class WicketPagePanelVisual extends JPanel implements HelpCtx.Provider, L
         settings.putProperty("wicketPageSuperclass", this.jComboBoxSuperclass.getSelectedItem());
     }
 
+    @Override
     public HelpCtx getHelpCtx() {
-        return new HelpCtx(WicketPagePanelVisual.class);
+        return new HelpCtx("org.netbeans.modules.web.wicket.template.filelevel.WicketPagePanelVisual");
     }
 
     @Override

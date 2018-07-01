@@ -1,18 +1,9 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.spi.project.ui.support.ProjectChooser
- *  org.openide.WizardDescriptor
- *  org.openide.WizardValidationException
- *  org.openide.awt.Mnemonics
- *  org.openide.filesystems.FileUtil
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.samples;
 
 import java.awt.Component;
-import java.awt.Container;
-import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -29,13 +20,16 @@ import javax.swing.LayoutStyle;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
-import org.netbeans.modules.web.wicket.samples.SampleApplicationWizardPanel;
 import org.netbeans.spi.project.ui.support.ProjectChooser;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.awt.Mnemonics;
 import org.openide.filesystems.FileUtil;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public class SampleApplicationPanelVisual extends JPanel implements DocumentListener, FocusListener {
 
     public static final String PROP_PROJECT_NAME = "projectName";

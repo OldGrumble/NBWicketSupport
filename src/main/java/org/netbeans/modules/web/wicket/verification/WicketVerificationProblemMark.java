@@ -1,11 +1,12 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.openide.text.Annotation
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.verification;
 
+/**
+ * 
+ * @author Tim Boudreau
+ */
 import org.openide.text.Annotation;
 
 public class WicketVerificationProblemMark extends Annotation {

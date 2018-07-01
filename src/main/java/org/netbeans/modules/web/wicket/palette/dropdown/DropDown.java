@@ -1,7 +1,6 @@
-// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.geocities.com/kpdus/jad.html
-// Decompiler options: packimports(3) lnc 
-// Source File Name:   DropDown.java
+/*
+ * Not ready for public use, so <b>don't use it</b>, yet.
+ */
 package org.netbeans.modules.web.wicket.palette.dropdown;
 
 import com.sun.source.util.TreePathScanner;
@@ -15,6 +14,10 @@ import org.openide.filesystems.FileObject;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.Exceptions;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public class DropDown implements ActiveEditorDrop {
 
     private static final String HTML = "\n<select wicket:id=\"names\">\n<option>option 1</option>\n<option>option 2</option>\n<option>option 3</option>\n</select>\n";
@@ -32,6 +35,7 @@ public class DropDown implements ActiveEditorDrop {
             try {
                 source.runUserActionTask(new Task<CompilationController>() {
 
+                    @Override
                     public void run(CompilationController compilationController) throws Exception {
                         compilationController.toPhase(org.netbeans.api.java.source.JavaSource.Phase.ELEMENTS_RESOLVED);
 

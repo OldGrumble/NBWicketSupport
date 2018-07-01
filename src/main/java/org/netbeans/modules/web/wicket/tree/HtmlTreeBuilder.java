@@ -1,14 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.html.lexer.HTMLTokenId
- *  org.netbeans.api.lexer.Language
- *  org.netbeans.api.lexer.Token
- *  org.netbeans.api.lexer.TokenHierarchy
- *  org.netbeans.api.lexer.TokenId
- *  org.netbeans.api.lexer.TokenSequence
- *  org.openide.util.Exceptions
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree;
 
@@ -21,6 +12,10 @@ import org.netbeans.api.html.lexer.HTMLTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public class HtmlTreeBuilder {
 
     private final Document doc;

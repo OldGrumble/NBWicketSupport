@@ -1,7 +1,6 @@
-// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.geocities.com/kpdus/jad.html
-// Decompiler options: packimports(3) lnc
-// Source File Name:   Installer.java
+/*
+ * Not ready for public use, so <b>don't use it</b>, yet.
+ */
 package org.netbeans.modules.web.wicket.installer;
 
 import java.beans.PropertyChangeEvent;
@@ -22,7 +21,7 @@ import org.openide.windows.WindowManager;
 /**
  * Installer class.
  *
- * @author Gj
+ * @author Tim Boudreau
  */
 public class Installer extends ModuleInstall {
 

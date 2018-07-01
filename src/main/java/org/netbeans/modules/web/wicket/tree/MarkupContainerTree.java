@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree;
 
@@ -13,6 +13,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public final class MarkupContainerTree<T> {
 
     private final NodeImpl<T> root;

@@ -1,14 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.modules.refactoring.api.AbstractRefactoring
- *  org.netbeans.modules.refactoring.api.MoveRefactoring
- *  org.netbeans.modules.refactoring.api.RenameRefactoring
- *  org.netbeans.modules.refactoring.api.SingleCopyRefactoring
- *  org.netbeans.modules.refactoring.spi.RefactoringPlugin
- *  org.netbeans.modules.refactoring.spi.RefactoringPluginFactory
- *  org.openide.ErrorManager
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.refactoring;
 
@@ -21,6 +12,10 @@ import org.netbeans.modules.refactoring.spi.RefactoringPluginFactory;
 import org.openide.ErrorManager;
 import org.openide.util.lookup.ServiceProvider;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 @ServiceProvider(service = RefactoringPluginFactory.class)
 public class WicketRefactoringFactory implements RefactoringPluginFactory {
 

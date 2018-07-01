@@ -1,13 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.java.source.CompilationController
- *  org.netbeans.api.java.source.JavaSource
- *  org.netbeans.api.java.source.JavaSource$Phase
- *  org.netbeans.api.java.source.Task
- *  org.openide.filesystems.FileObject
- *  org.openide.util.Exceptions
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree;
 
@@ -45,7 +37,7 @@ import org.openide.util.Exceptions;
  * JavaSource: Class representing Java source file opened in the (NetBeans)
  * editor.
  *
- * @author Geertjan Wielenga
+ * @author Tim Boudreau
  */
 public final class JavaTreeBuilder {
 

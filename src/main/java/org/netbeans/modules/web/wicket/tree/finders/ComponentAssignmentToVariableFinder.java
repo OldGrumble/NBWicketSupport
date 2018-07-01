@@ -1,6 +1,5 @@
 /*
- * Some license issues have still to be clarified, especially for the "borrowed"
- * package, so <b>don't use it</b>, yet.
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.finders;
 
@@ -13,6 +12,10 @@ import java.util.Set;
 import org.netbeans.api.java.source.CompilationController;
 import org.netbeans.modules.web.wicket.tree.util.Utils;
 
+/**
+ * 
+ * @author Tim Boudreau
+ */
 public class ComponentAssignmentToVariableFinder extends TreeScanner<Void, Set<Tree>> {
 
     private final CompilationController cc;

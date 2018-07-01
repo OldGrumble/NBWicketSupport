@@ -1,17 +1,9 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.openide.DialogDescriptor
- *  org.openide.DialogDisplayer
- *  org.openide.util.NbBundle
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.palette.editablefield;
 
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dialog;
-import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.GroupLayout;
@@ -20,11 +12,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.web.wicket.palette.editablefield.Editable;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.NbBundle;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public class EditableCustomizer extends JPanel {
 
     private Dialog dialog = null;
@@ -50,10 +45,10 @@ public class EditableCustomizer extends JPanel {
         String displayName = "";
         try {
             displayName = NbBundle.getBundle((String)"org.netbeans.modules.web.wicket.palette.label.Bundle").getString("NAME_html-LABEL");
-        } catch (Exception e) {
+        } catch (Exception ex) {
             // empty catch block
         }
-        this.descriptor = new DialogDescriptor((Object)this, NbBundle.getMessage(EditableCustomizer.class, (String)"LBL_Customizer_InsertPrefix") + " " + displayName, true, 2, DialogDescriptor.OK_OPTION, new ActionListener() {
+        this.descriptor = new DialogDescriptor(this, NbBundle.getMessage(EditableCustomizer.class, "LBL_Customizer_InsertPrefix") + " " + displayName, true, 2, DialogDescriptor.OK_OPTION, new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -97,5 +92,4 @@ public class EditableCustomizer extends JPanel {
         layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(layout.createSequentialGroup().addContainerGap().addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING).addComponent(this.jLabel1).addComponent(this.jLabel2).addComponent(this.jLabel3)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addComponent(this.wicketIdTextField, -1, 178, 32767).addComponent(this.placeholderTextField, -1, 178, 32767).addComponent(this.initialTextField, -1, 178, 32767)).addContainerGap()));
         layout.setVerticalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(layout.createSequentialGroup().addContainerGap().addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(this.jLabel1).addComponent(this.wicketIdTextField, -2, -1, -2)).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED).addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(this.jLabel2).addComponent(this.placeholderTextField, -2, -1, -2)).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED).addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(this.initialTextField, -2, -1, -2).addComponent(this.jLabel3)).addContainerGap(-1, 32767)));
     }
-
 }

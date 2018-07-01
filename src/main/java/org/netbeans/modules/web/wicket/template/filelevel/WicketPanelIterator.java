@@ -1,37 +1,14 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.java.classpath.ClassPath
- *  org.netbeans.api.project.Project
- *  org.netbeans.api.project.ProjectUtils
- *  org.netbeans.api.project.SourceGroup
- *  org.netbeans.spi.java.project.support.ui.templates.JavaTemplates
- *  org.netbeans.spi.project.ui.templates.support.Templates
- *  org.openide.WizardDescriptor
- *  org.openide.WizardDescriptor$Panel
- *  org.openide.cookies.EditorCookie
- *  org.openide.cookies.SaveCookie
- *  org.openide.filesystems.FileObject
- *  org.openide.loaders.DataFolder
- *  org.openide.loaders.DataObject
- *  org.openide.loaders.TemplateWizard
- *  org.openide.loaders.TemplateWizard$Iterator
- *  org.openide.nodes.Node
- *  org.openide.nodes.Node$Cookie
- *  org.openide.util.NbBundle
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.template.filelevel;
 
-import java.awt.Component;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
@@ -39,8 +16,6 @@ import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
-import org.netbeans.modules.web.wicket.template.filelevel.WicketPageIterator;
-import org.netbeans.modules.web.wicket.template.filelevel.WicketPanelPanel;
 import org.netbeans.spi.java.project.support.ui.templates.JavaTemplates;
 import org.netbeans.spi.project.ui.templates.support.Templates;
 import org.openide.WizardDescriptor;
@@ -50,21 +25,26 @@ import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataFolder;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.TemplateWizard;
-import org.openide.nodes.Node;
 import org.openide.util.NbBundle;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public class WicketPanelIterator implements TemplateWizard.Iterator {
 
-    private int index;
-    private transient WizardDescriptor.Panel[] panels;
-    private transient boolean debug = false;
     private static String htmltext = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n\n<html>\n  <head>\n    <title></title>\n  </head>\n  <body>\n     <wicket:panel>\n        <span wicket:id=\"message\">this text will be replaced</span>\n     </wicket:panel>\n  </body>\n</html>";
     private static String javatext = "/*\n * __CLASS__.java\n *\n * Created on March 19, 2006, 1:13 PM\n *\n */\n\npackage __PACKAGE__;\n\nimport __FULL_SUPERCLASS__;\nimport org.apache.wicket.markup.html.basic.Label;\n\npublic class __CLASS__ extends __SUPERCLASS__ {\n\n    /** Creates a new instance of __CLASS__ */\n    public __CLASS__(String id) {\n        super(id);\n        add(new Label(\"message\", \"I am a reusable component!\"));\n    }\n\n}";
+
+    private final transient boolean debug = false;
+    private transient WizardDescriptor.Panel[] panels;
+    private int index;
 
     public static WicketPanelIterator createIterator() {
         return new WicketPanelIterator();
     }
 
+    @Override
     public void initialize(TemplateWizard wizard) {
         if (this.debug) {
             this.log("initialize");
@@ -96,15 +76,17 @@ public class WicketPanelIterator implements TemplateWizard.Iterator {
             if (steps[i] == null) {
                 steps[i] = jc.getName();
             }
-            jc.putClientProperty("WizardPanel_contentSelectedIndex", new Integer(i));
+            jc.putClientProperty("WizardPanel_contentSelectedIndex", i);
             jc.putClientProperty("WizardPanel_contentData", steps);
         }
     }
 
+    @Override
     public void uninitialize(TemplateWizard wizard) {
         this.panels = null;
     }
 
+    @Override
     public Set instantiate(TemplateWizard wizard) throws IOException {
         if (this.debug) {
             this.log("instantiate");
@@ -146,6 +128,7 @@ public class WicketPanelIterator implements TemplateWizard.Iterator {
         return null;
     }
 
+    @Override
     public void previousPanel() {
         if (!this.hasPrevious()) {
             throw new NoSuchElementException();
@@ -153,6 +136,7 @@ public class WicketPanelIterator implements TemplateWizard.Iterator {
         --this.index;
     }
 
+    @Override
     public void nextPanel() {
         if (!this.hasNext()) {
             throw new NoSuchElementException();
@@ -160,25 +144,31 @@ public class WicketPanelIterator implements TemplateWizard.Iterator {
         ++this.index;
     }
 
+    @Override
     public boolean hasPrevious() {
         return this.index > 0;
     }
 
+    @Override
     public boolean hasNext() {
         return this.index < this.panels.length - 1;
     }
 
+    @Override
     public String name() {
-        return NbBundle.getMessage(WicketPageIterator.class, (String)"TITLE_x_of_y", (Object)new Integer(this.index + 1), (Object)new Integer(this.panels.length));
+        return NbBundle.getMessage(WicketPageIterator.class, "TITLE_x_of_y", new Integer(this.index + 1), new Integer(this.panels.length));
     }
 
+    @Override
     public WizardDescriptor.Panel current() {
         return this.panels[this.index];
     }
 
+    @Override
     public final void addChangeListener(ChangeListener l) {
     }
 
+    @Override
     public final void removeChangeListener(ChangeListener l) {
     }
 

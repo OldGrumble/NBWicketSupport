@@ -1,20 +1,8 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.java.source.CompilationController
- *  org.netbeans.api.java.source.CompilationInfo
- *  org.netbeans.api.java.source.JavaSource
- *  org.netbeans.api.java.source.JavaSource$Phase
- *  org.netbeans.api.java.source.Task
- *  org.openide.filesystems.FileObject
- *  org.openide.text.ActiveEditorDrop
- *  org.openide.util.Exceptions
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.palette.label;
 
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePathScanner;
 import java.io.IOException;
 import javax.swing.text.BadLocationException;
@@ -25,18 +13,21 @@ import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.Task;
 import org.netbeans.api.wicket.JavaForMarkupQuery;
 import org.netbeans.modules.web.wicket.palette.Utilities;
-import org.netbeans.modules.web.wicket.palette.label.LabelCustomizer;
 import org.openide.filesystems.FileObject;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.Exceptions;
 
-public class Label
-        implements ActiveEditorDrop {
+/**
+ *
+ * @author Tim Boudreau
+ */
+public class Label implements ActiveEditorDrop {
 
     private String wicketId = "";
     private String placeholderText = "";
     private String initialValue = "";
 
+    @Override
     public boolean handleTransfer(JTextComponent targetComponent) {
         LabelCustomizer c = new LabelCustomizer(this, targetComponent);
         boolean accept = c.showDialog();
@@ -45,8 +36,9 @@ public class Label
                 String body = "\n<span wicket:id=\"" + this.getWicketId() + "\">" + this.getPlaceholderText() + "</span>\n";
                 FileObject javaFo = JavaForMarkupQuery.find(Utilities.getFileObject(targetComponent));
                 final JavaSource source = JavaSource.forFileObject((FileObject)javaFo);
-                source.runUserActionTask((Task)new Task<CompilationController>() {
+                source.runUserActionTask(new Task<CompilationController>() {
 
+                    @Override
                     public void run(CompilationController compilationController) throws Exception {
                         compilationController.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED);
 

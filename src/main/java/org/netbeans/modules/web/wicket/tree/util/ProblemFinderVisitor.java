@@ -1,10 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.java.source.CompilationController
- *  org.netbeans.api.java.source.TreePathHandle
- *  org.openide.filesystems.FileObject
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.util;
 
@@ -19,6 +14,10 @@ import org.netbeans.api.java.source.CompilationController;
 import org.netbeans.api.java.source.TreePathHandle;
 import org.openide.filesystems.FileObject;
 
+/**
+ * 
+ * @author Tim Boudreau
+ */
 public interface ProblemFinderVisitor {
 
     public void visitWicketAddInvocation(Invocation var1, CompilationController var2, FileObject var3, Collection<? super Problem> var4);

@@ -1,8 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.project.Project
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.spi;
 
@@ -10,6 +7,10 @@ import org.netbeans.api.project.Project;
 import org.netbeans.spi.wicket.WicketProjectQueryImplementation;
 import org.openide.util.lookup.ServiceProvider;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 @ServiceProvider(service = WicketProjectQueryImplementation.class)
 public class WpqImpl implements WicketProjectQueryImplementation {
 

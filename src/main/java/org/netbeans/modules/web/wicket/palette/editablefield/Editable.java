@@ -1,20 +1,8 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.java.source.CompilationController
- *  org.netbeans.api.java.source.CompilationInfo
- *  org.netbeans.api.java.source.JavaSource
- *  org.netbeans.api.java.source.JavaSource$Phase
- *  org.netbeans.api.java.source.Task
- *  org.openide.filesystems.FileObject
- *  org.openide.text.ActiveEditorDrop
- *  org.openide.util.Exceptions
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.palette.editablefield;
 
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.Tree;
 import java.io.IOException;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -24,13 +12,14 @@ import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.Task;
 import org.netbeans.api.wicket.JavaForMarkupQuery;
 import org.netbeans.modules.web.wicket.palette.Utilities;
-import org.netbeans.modules.web.wicket.palette.editablefield.AddEditable;
-import org.netbeans.modules.web.wicket.palette.editablefield.AddModel;
-import org.netbeans.modules.web.wicket.palette.editablefield.EditableCustomizer;
 import org.openide.filesystems.FileObject;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.Exceptions;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public class Editable implements ActiveEditorDrop {
 
     private String wicketId = "";
@@ -52,6 +41,7 @@ public class Editable implements ActiveEditorDrop {
                 final JavaSource source = JavaSource.forFileObject((FileObject)javaFo);
                 source.runUserActionTask((Task)new Task<CompilationController>() {
 
+                    @Override
                     public void run(CompilationController compilationController) throws Exception {
                         compilationController.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED);
                         new AddModel(source, (CompilationInfo)compilationController, Editable.this.getWicketId(), Editable.this.getInitialValue()).scan(compilationController.getCompilationUnit(), null);
@@ -59,13 +49,15 @@ public class Editable implements ActiveEditorDrop {
                 }, true);
                 source.runUserActionTask((Task)new Task<CompilationController>() {
 
+                    @Override
                     public void run(CompilationController compilationController) throws Exception {
                         compilationController.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED);
                         new AddEditable(source, (CompilationInfo)compilationController, Editable.this.getWicketId(), Editable.this.getInitialValue()).scan(compilationController.getCompilationUnit(), null);
                     }
                 }, true);
-                source.runUserActionTask((Task)new Task<CompilationController>() {
+                source.runUserActionTask(new Task<CompilationController>() {
 
+                    @Override
                     public void run(CompilationController compilationController) throws Exception {
                         compilationController.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED);
                         Utilities.addMethodToClass(source, Utilities.getGetter(Editable.this.getWicketId()), "String", "return " + Editable.this.getWicketId());

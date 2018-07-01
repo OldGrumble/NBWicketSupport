@@ -1,8 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.openide.util.NbBundle
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.util;
 
@@ -19,6 +16,10 @@ import org.netbeans.modules.web.wicket.tree.diff.Change;
 import org.netbeans.modules.web.wicket.tree.diff.Diff;
 import org.openide.util.NbBundle;
 
+/**
+ * 
+ * @author Tim Boudreau
+ */
 public final class TreeDiff {
 
     private final MarkupContainerTree<String> java;

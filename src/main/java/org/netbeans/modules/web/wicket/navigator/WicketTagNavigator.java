@@ -1,18 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.spi.navigator.NavigatorPanel
- *  org.openide.cookies.EditorCookie
- *  org.openide.filesystems.FileObject
- *  org.openide.loaders.DataObject
- *  org.openide.util.Exceptions
- *  org.openide.util.Lookup
- *  org.openide.util.Lookup$Result
- *  org.openide.util.LookupEvent
- *  org.openide.util.LookupListener
- *  org.openide.util.NbBundle
- *  org.openide.windows.TopComponent
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.navigator;
 
@@ -53,6 +40,10 @@ import org.openide.util.LookupListener;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 
+/**
+ * 
+ * @author Tim Boudreau
+ */
 @NavigatorPanel.Registration(
         mimeType = WicketSupportConstants.MIME_TYPE_HTML,
         displayName = "#LBL_NAME"

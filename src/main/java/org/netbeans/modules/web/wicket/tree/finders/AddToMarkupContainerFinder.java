@@ -1,6 +1,5 @@
 /*
- * Some license issues have still to be clarified, especially for the "borrowed"
- * package, so <b>don't use it</b>, yet.
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.finders;
 
@@ -26,10 +25,11 @@ import org.netbeans.modules.web.wicket.tree.util.Utils;
  * A TreeScanner implementation for collecting all invocations of some type.<br>
  * TODO: Which types?<br>
  * <br>
- * This class uses a sub-scanner, AssignmentTracer, for still unknown reasons.<br>
+ * This class uses a sub-scanner, AssignmentTracer, for still unknown
+ * reasons.<br>
  * TODO: For which reasons AssignmentTracer is used?
  *
- * @author Geertjan Wielenga
+ * @author Tim Boudreau
  */
 public final class AddToMarkupContainerFinder extends TreeScanner<Void, List<Invocation>> {
 

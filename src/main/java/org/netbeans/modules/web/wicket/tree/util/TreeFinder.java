@@ -1,13 +1,17 @@
 /*
- * Decompiled with CFR 0_130.
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.tree.util;
 
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 
-public class TreeFinder
-extends TreeScanner<Void, Void> {
+/**
+ *
+ * @author Tim Boudreau
+ */
+public class TreeFinder extends TreeScanner<Void, Void> {
+
     private final Tree lookFor;
     private boolean found = false;
 
@@ -28,4 +32,3 @@ extends TreeScanner<Void, Void> {
         return (Void)super.scan(arg0, arg1);
     }
 }
-

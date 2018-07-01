@@ -1,29 +1,9 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.project.FileOwnerQuery
- *  org.netbeans.api.project.Project
- *  org.netbeans.modules.refactoring.api.AbstractRefactoring
- *  org.netbeans.modules.refactoring.api.Problem
- *  org.netbeans.modules.refactoring.api.RenameRefactoring
- *  org.netbeans.modules.refactoring.spi.RefactoringElementImplementation
- *  org.netbeans.modules.refactoring.spi.RefactoringElementsBag
- *  org.netbeans.modules.refactoring.spi.RefactoringPlugin
- *  org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation
- *  org.openide.ErrorManager
- *  org.openide.filesystems.FileLock
- *  org.openide.filesystems.FileObject
- *  org.openide.loaders.DataObject
- *  org.openide.text.PositionBounds
- *  org.openide.util.Exceptions
- *  org.openide.util.Lookup
- *  org.openide.util.NbBundle
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.refactoring;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.text.MessageFormat;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
@@ -36,7 +16,6 @@ import org.netbeans.modules.refactoring.spi.RefactoringElementImplementation;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;
-import org.netbeans.modules.web.wicket.refactoring.WicketCopyClassRefactoringPlugin;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
@@ -46,10 +25,15 @@ import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public class WicketRenameRefactoringPlugin implements RefactoringPlugin {
 
     private static final ErrorManager ERR = ErrorManager.getDefault().getInstance("org.netbeans.modules.web.wicket.refactoring");
-    private RenameRefactoring refactoring;
+
+    private final RenameRefactoring refactoring;
 
     public WicketRenameRefactoringPlugin(RenameRefactoring refactoring) {
         this.refactoring = refactoring;
@@ -70,9 +54,11 @@ public class WicketRenameRefactoringPlugin implements RefactoringPlugin {
         return null;
     }
 
+    @Override
     public void cancelRequest() {
     }
 
+    @Override
     public Problem prepare(RefactoringElementsBag bag) {
         DataObject dob;
         String name = this.refactoring.getNewName();
@@ -112,9 +98,9 @@ public class WicketRenameRefactoringPlugin implements RefactoringPlugin {
     private final class HTMLRenameRefactoringElement
             extends SimpleRefactoringElementImplementation {
 
-        private FileObject foHtml;
-        private String oldName;
-        private String newName;
+        private final FileObject foHtml;
+        private final String oldName;
+        private final String newName;
 
         HTMLRenameRefactoringElement(FileObject fo, String newName, String oldName) {
             this.foHtml = fo;
@@ -122,10 +108,12 @@ public class WicketRenameRefactoringPlugin implements RefactoringPlugin {
             this.oldName = oldName;
         }
 
+        @Override
         public String toString() {
             return "Rename " + this.foHtml.getPath() + " from " + this.oldName + " to " + this.newName;
         }
 
+        @Override
         public void performChange() {
             try {
                 FileLock lock = this.foHtml.lock();
@@ -139,6 +127,7 @@ public class WicketRenameRefactoringPlugin implements RefactoringPlugin {
             }
         }
 
+        @Override
         public void undoChange() {
             ERR.log("Perform undo");
             FileLock fileLock = null;
@@ -155,22 +144,27 @@ public class WicketRenameRefactoringPlugin implements RefactoringPlugin {
             }
         }
 
+        @Override
         public String getText() {
             return NbBundle.getMessage(WicketCopyClassRefactoringPlugin.class, (String)"lbl_rename", (Object)this.foHtml.getNameExt(), (Object)this.newName);
         }
 
+        @Override
         public String getDisplayText() {
             return MessageFormat.format(NbBundle.getMessage(WicketRenameRefactoringPlugin.class, (String)"TXT_WicketHtmlRename"), this.newName);
         }
 
+        @Override
         public FileObject getParentFile() {
             return this.foHtml;
         }
 
+        @Override
         public PositionBounds getPosition() {
             return null;
         }
 
+        @Override
         public Lookup getLookup() {
             return Lookup.EMPTY;
         }
