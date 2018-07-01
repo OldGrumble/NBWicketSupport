@@ -3,90 +3,97 @@
  */
 package org.netbeans.modules.web.wicket.actions;
 
-import org.netbeans.api.project.FileOwnerQuery;
-import org.netbeans.api.project.Project;
+import java.awt.event.ActionEvent;
+import javax.swing.Action;
+import javax.swing.SwingUtilities;
 import org.netbeans.api.wicket.JavaForMarkupQuery;
-import org.netbeans.api.wicket.WicketProjectQuery;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionRegistration;
-import org.openide.cookies.EditorCookie;
 import org.openide.cookies.OpenCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
-import org.openide.nodes.Node;
 import org.openide.util.*;
-import org.openide.util.actions.CookieAction;
 
 /**
  *
- * @author Tim Boudreau
+ * @author Tim Boudreau (original author)
+ * @author Peter Nabbefeld
  */
 @ActionID(
         id = "org.netbeans.modules.web.wicket.actions.GotoJavaAction",
         category = "Wicket"
 )
 @ActionRegistration(displayName = "#CTL_GotoJavaAction", lazy = false)
-public class GotoJavaAction extends CookieAction {
+public class GotoJavaAction extends AbstractGotoAction {
+
+    private static final long serialVersionUID = 1L;
+
+    private Lookup context;
+    Lookup.Result<DataObject> lkpInfo;
 
     public GotoJavaAction() {
+        this(Utilities.actionsGlobalContext());
     }
 
+    private GotoJavaAction(Lookup context) {
+//        putValue(Action.NAME, NbBundle.getMessage(GotoHTMLAction.class, "CTL_GotoHTMLAction"));
+        this.context = context;
+    }
+
+    void init() {
+        assert SwingUtilities.isEventDispatchThread() : "this shall be called just from AWT thread";
+
+        if (lkpInfo != null) {
+            return;
+        }
+
+        // The thing we want to listen for the presence or absence of
+        // on the global selection
+        lkpInfo = context.lookupResult(DataObject.class);
+        lkpInfo.addLookupListener(this);
+        resultChanged(null);
+    }
+
+    /**
+     * Open the Java file.
+     *
+     * @param evt The ActionEvent triggering this method.
+     */
     @Override
-    protected void performAction(Node activatedNodes[]) {
-        DataObject dObj = (DataObject)activatedNodes[0].getLookup().lookup(DataObject.class);
-        FileObject fo = JavaForMarkupQuery.find(dObj.getPrimaryFile());
-        try {
-            DataObject javaDobj = DataObject.find(fo);
-            OpenCookie oc = (OpenCookie)javaDobj.getCookie(OpenCookie.class);
-            oc.open();
-        } catch (DataObjectNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+    public void actionPerformed(ActionEvent evt) {
+        init();
+        for (DataObject dObj : lkpInfo.allInstances()) {
+            FileObject fo = JavaForMarkupQuery.find(dObj.getPrimaryFile());
+            try {
+                DataObject javaDobj = DataObject.find(fo);
+                OpenCookie oc = (OpenCookie)javaDobj.getLookup().lookup(OpenCookie.class);
+                oc.open();
+            } catch (DataObjectNotFoundException ex) {
+                Exceptions.printStackTrace(ex);
+            }
         }
     }
 
+    /**
+     * Enable this action only if Wicket framework is added to this project and
+     * the selected HTML file has a Java counterpart.
+     *
+     * @return True, if this action should be enabled.
+     */
     @Override
-    protected boolean enable(Node activatedNodes[]) {
-        DataObject dObj = (DataObject)activatedNodes[0].getLookup().lookup(DataObject.class);
-        FileObject fo = JavaForMarkupQuery.find(dObj.getPrimaryFile());
-        if (fo != null) {
-            Project proj = FileOwnerQuery.getOwner(fo);
-            return proj != null && WicketProjectQuery.isWicket(proj);
-        } else {
-            return false;
-        }
+    public boolean isEnabled() {
+        init();
+        return lkpInfo != null && lkpInfo.allInstances().size() == 1 && inWicketProject(lkpInfo.allInstances().iterator().next());
     }
 
     @Override
-    protected int mode() {
-        return MODE_EXACTLY_ONE;
+    public void resultChanged(LookupEvent ev) {
+        setEnabled(!lkpInfo.allInstances().isEmpty());
     }
 
     @Override
-    public String getName() {
-        return NbBundle.getMessage(GotoJavaAction.class, "CTL_GotoJavaAction");
-    }
-
-    @Override
-    protected Class[] cookieClasses() {
-        return (new Class[]{
-            EditorCookie.class
-        });
-    }
-
-    @Override
-    protected void initialize() {
-        super.initialize();
-        putValue("noIconInMenu", Boolean.TRUE);
-    }
-
-    @Override
-    public HelpCtx getHelpCtx() {
-        return HelpCtx.DEFAULT_HELP;
-    }
-
-    @Override
-    protected boolean asynchronous() {
-        return false;
+    public Action createContextAwareInstance(Lookup context) {
+        return new GotoJavaAction(context);
     }
 }
