@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.api.wicket;
 
@@ -13,7 +11,7 @@ import org.openide.util.Lookup;
 
 /**
  *
- * @author peter
+ * @author Tim Boudreau
  */
 public class MarkupForJavaQuery {
 

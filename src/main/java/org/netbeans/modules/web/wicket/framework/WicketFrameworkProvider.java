@@ -1,41 +1,5 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.api.java.project.classpath.ProjectClassPathModifier
- *  org.netbeans.api.project.FileOwnerQuery
- *  org.netbeans.api.project.Project
- *  org.netbeans.api.project.ProjectUtils
- *  org.netbeans.api.project.SourceGroup
- *  org.netbeans.api.project.SourceGroupModifier
- *  org.netbeans.api.project.libraries.Library
- *  org.netbeans.api.project.libraries.LibraryManager
- *  org.netbeans.modules.j2ee.dd.api.common.CommonDDBean
- *  org.netbeans.modules.j2ee.dd.api.common.InitParam
- *  org.netbeans.modules.j2ee.dd.api.web.DDProvider
- *  org.netbeans.modules.j2ee.dd.api.web.Filter
- *  org.netbeans.modules.j2ee.dd.api.web.FilterMapping
- *  org.netbeans.modules.j2ee.dd.api.web.WebApp
- *  org.netbeans.modules.j2ee.dd.api.web.WelcomeFileList
- *  org.netbeans.modules.web.api.webmodule.ExtenderController
- *  org.netbeans.modules.web.api.webmodule.ExtenderController$Properties
- *  org.netbeans.modules.web.api.webmodule.WebModule
- *  org.netbeans.modules.web.spi.webmodule.WebFrameworkProvider
- *  org.netbeans.modules.web.spi.webmodule.WebModuleExtender
- *  org.netbeans.spi.project.support.ant.EditableProperties
- *  org.openide.ErrorManager
- *  org.openide.cookies.OpenCookie
- *  org.openide.filesystems.FileLock
- *  org.openide.filesystems.FileObject
- *  org.openide.filesystems.FileSystem
- *  org.openide.filesystems.FileSystem$AtomicAction
- *  org.openide.filesystems.FileUtil
- *  org.openide.loaders.DataObject
- *  org.openide.nodes.Node
- *  org.openide.nodes.Node$Cookie
- *  org.openide.util.Exceptions
- *  org.openide.util.MapFormat
- *  org.openide.util.NbBundle
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.framework;
 
@@ -48,13 +12,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import org.netbeans.api.java.project.classpath.ProjectClassPathModifier;
 import org.netbeans.api.project.FileOwnerQuery;
@@ -64,7 +25,6 @@ import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.SourceGroupModifier;
 import org.netbeans.api.project.libraries.Library;
 import org.netbeans.api.project.libraries.LibraryManager;
-import org.netbeans.modules.j2ee.dd.api.common.CommonDDBean;
 import org.netbeans.modules.j2ee.dd.api.common.InitParam;
 import org.netbeans.modules.j2ee.dd.api.web.DDProvider;
 import org.netbeans.modules.j2ee.dd.api.web.Filter;
@@ -75,9 +35,6 @@ import org.netbeans.modules.web.api.webmodule.ExtenderController;
 import org.netbeans.modules.web.api.webmodule.WebModule;
 import org.netbeans.modules.web.spi.webmodule.WebFrameworkProvider;
 import org.netbeans.modules.web.spi.webmodule.WebModuleExtender;
-import org.netbeans.modules.web.wicket.framework.WicketConfigUtilities;
-import org.netbeans.modules.web.wicket.framework.WicketConfigurationPanelVisual;
-import org.netbeans.modules.web.wicket.framework.WicketWebModuleExtender;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.openide.ErrorManager;
 import org.openide.cookies.OpenCookie;
@@ -86,11 +43,14 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
-import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.MapFormat;
 import org.openide.util.NbBundle;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public class WicketFrameworkProvider extends WebFrameworkProvider {
 
     private static final String defaultAppResource = "Application";

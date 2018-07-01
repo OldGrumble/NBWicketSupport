@@ -1,3 +1,6 @@
+/*
+ * Not ready for public use, so <b>don't use it</b>, yet.
+ */
 package org.netbeans.modules.web.wicket.framework;
 
 import java.awt.CardLayout;
@@ -50,7 +53,7 @@ import org.xml.sax.SAXException;
 
 /**
  *
- * @author Gj
+ * @author Tim Boudreau
  */
 public class WicketConfigurationPanelVisual extends JPanel implements HelpCtx.Provider, DocumentListener {
 
@@ -58,10 +61,11 @@ public class WicketConfigurationPanelVisual extends JPanel implements HelpCtx.Pr
 
     /**
      * Creates new form WicketConfigurationPanelVisual
-     * 
+     *
      * @param extender Extends the panel by a status line etc.
      * @param framework Provides access to Wicket and its configuration
-     * @param enableComponents Flag indicating if the components should be enabled
+     * @param enableComponents Flag indicating if the components should be
+     * enabled
      */
     public WicketConfigurationPanelVisual(WicketWebModuleExtender extender, WicketFrameworkProvider framework, boolean enableComponents) {
         this.extender = extender;
@@ -279,7 +283,7 @@ public class WicketConfigurationPanelVisual extends JPanel implements HelpCtx.Pr
     private void checkFolderInstallation() {
         File folder = new File(this.jtFolder.getText());
         if (!WicketConfigUtilities.isWicketInstallFolder(folder)) {
-            this.extender.setErrorMessage(NbBundle.getMessage(WicketConfigurationPanelVisual_without_form.class, (String)"MSG_PathIsNotWicketFolder"));
+            this.extender.setErrorMessage(NbBundle.getMessage(WicketConfigurationPanelVisual.class, (String)"MSG_PathIsNotWicketFolder"));
         } else {
             this.extender.setErrorMessage(null);
             this.jpLibrary.setVisible(false);

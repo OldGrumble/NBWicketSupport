@@ -1,3 +1,6 @@
+/*
+ * Not ready for public use, so <b>don't use it</b>, yet.
+ */
 package org.netbeans.modules.web.wicket.actions;
 
 import org.netbeans.api.project.FileOwnerQuery;
@@ -17,6 +20,10 @@ import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.CookieAction;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 @ActionID(
         id = "org.netbeans.modules.web.wicket.actions.GotoHTMLAction",
         category = "Wicket"

@@ -1,7 +1,6 @@
-// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.geocities.com/kpdus/jad.html
-// Decompiler options: packimports(3) lnc 
-// Source File Name:   GotoJavaAction.java
+/*
+ * Not ready for public use, so <b>don't use it</b>, yet.
+ */
 package org.netbeans.modules.web.wicket.actions;
 
 import org.netbeans.api.project.FileOwnerQuery;
@@ -19,6 +18,10 @@ import org.openide.nodes.Node;
 import org.openide.util.*;
 import org.openide.util.actions.CookieAction;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 @ActionID(
         id = "org.netbeans.modules.web.wicket.actions.GotoJavaAction",
         category = "Wicket"

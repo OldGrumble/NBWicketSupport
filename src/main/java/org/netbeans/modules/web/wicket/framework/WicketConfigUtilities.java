@@ -1,31 +1,26 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.modules.j2ee.dd.api.common.CommonDDBean
- *  org.netbeans.modules.j2ee.dd.api.web.DDProvider
- *  org.netbeans.modules.j2ee.dd.api.web.Filter
- *  org.netbeans.modules.j2ee.dd.api.web.FilterMapping
- *  org.netbeans.modules.j2ee.dd.api.web.WebApp
- *  org.openide.filesystems.FileObject
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.framework;
 
 import java.io.File;
 import java.io.IOException;
-import org.netbeans.modules.j2ee.dd.api.common.CommonDDBean;
 import org.netbeans.modules.j2ee.dd.api.web.DDProvider;
 import org.netbeans.modules.j2ee.dd.api.web.Filter;
 import org.netbeans.modules.j2ee.dd.api.web.FilterMapping;
 import org.netbeans.modules.j2ee.dd.api.web.WebApp;
 import org.openide.filesystems.FileObject;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public class WicketConfigUtilities {
 
     private static final String WICKET_JAR = "wicket";
     private static final String LIBS_FOLDER = "org-netbeans-api-project-libraries/Libraries";
     private static final String LIB_WICKET_FILE = "wicket.xml";
-    public static String DEFAULT_MODULE_NAME = "config";
+    private static final String DEFAULT_MODULE_NAME = "config";
     private static final int TYPE_ACTION = 0;
     private static final int TYPE_FORM_BEAN = 1;
     private static final int TYPE_MESSAGE_RESOURCES = 2;

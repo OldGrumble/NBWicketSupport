@@ -1,36 +1,25 @@
 /*
- * Decompiled with CFR 0_130.
- * 
- * Could not load the following classes:
- *  org.netbeans.modules.web.api.webmodule.ExtenderController
- *  org.netbeans.modules.web.api.webmodule.WebModule
- *  org.netbeans.modules.web.spi.webmodule.WebModuleExtender
- *  org.openide.WizardDescriptor
- *  org.openide.WizardDescriptor$FinishablePanel
- *  org.openide.WizardDescriptor$ValidatingPanel
- *  org.openide.WizardValidationException
- *  org.openide.util.HelpCtx
+ * Not ready for public use, so <b>don't use it</b>, yet.
  */
 package org.netbeans.modules.web.wicket.framework;
 
-import java.awt.Component;
 import java.io.File;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import javax.swing.JComponent;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.modules.web.api.webmodule.ExtenderController;
 import org.netbeans.modules.web.api.webmodule.WebModule;
 import org.netbeans.modules.web.spi.webmodule.WebModuleExtender;
-import org.netbeans.modules.web.wicket.framework.WicketConfigurationPanelVisual;
-import org.netbeans.modules.web.wicket.framework.WicketFrameworkProvider;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
+/**
+ *
+ * @author Tim Boudreau
+ */
 public final class WicketWebModuleExtender extends WebModuleExtender implements WizardDescriptor.FinishablePanel, WizardDescriptor.ValidatingPanel {
 
     private WicketFrameworkProvider framework;
