@@ -22,58 +22,56 @@ import org.openide.util.HelpCtx;
  */
 public final class WicketWebModuleExtender extends WebModuleExtender implements WizardDescriptor.FinishablePanel, WizardDescriptor.ValidatingPanel {
 
-    private WicketFrameworkProvider framework;
+    private final WicketFrameworkProvider framework;
+    private final boolean isEnabled;
     private final ExtenderController controller;
     private WicketConfigurationPanelVisual component;
     private WizardDescriptor wizardDescriptor;
     private String error_message;
-    private final boolean isEnabled;
     private final Set listeners = new HashSet(1);
 
     public WicketWebModuleExtender(WicketFrameworkProvider framework, ExtenderController controller, boolean isEnabled) {
         this.framework = framework;
         this.controller = controller;
         this.isEnabled = isEnabled;
-        this.getComponent();
+        getComponent();
     }
 
+    @Override
     public boolean isFinishPanel() {
         return true;
     }
 
+    @Override
     public WicketConfigurationPanelVisual getComponent() {
-        if (this.component == null) {
-            this.component = new WicketConfigurationPanelVisual(this, this.framework, this.isEnabled);
+        if (component == null) {
+            component = new WicketConfigurationPanelVisual(this, framework, isEnabled);
         }
         return this.component;
     }
 
+    @Override
     public HelpCtx getHelp() {
-        return new HelpCtx(WicketWebModuleExtender.class);
+        return new HelpCtx("org.netbeans.modules.web.wicket.framework.WicketWebModuleExtender");
     }
 
+    @Override
     public boolean isValid() {
         this.getComponent();
-        return this.component.valid(this.wizardDescriptor);
+        return component.valid(wizardDescriptor);
     }
 
-    /*
-     * WARNING - Removed try catching itself - possible behaviour change.
-     */
+    @Override
     public final void addChangeListener(ChangeListener l) {
-        Set set = this.listeners;
-        synchronized (set) {
-            this.listeners.add(l);
+        synchronized (listeners) {
+            listeners.add(l);
         }
     }
 
-    /*
-     * WARNING - Removed try catching itself - possible behaviour change.
-     */
+    @Override
     public final void removeChangeListener(ChangeListener l) {
-        Set set = this.listeners;
-        synchronized (set) {
-            this.listeners.remove(l);
+        synchronized (listeners) {
+            listeners.remove(l);
         }
     }
 
@@ -81,108 +79,112 @@ public final class WicketWebModuleExtender extends WebModuleExtender implements 
      * WARNING - Removed try catching itself - possible behaviour change.
      */
     protected final void fireChangeEvent() {
-        Iterator it;
-        Set set = this.listeners;
-        synchronized (set) {
-            it = new HashSet(this.listeners).iterator();
+        Iterator<ChangeListener> it;
+        synchronized (listeners) {
+            it = new HashSet(listeners).iterator();
         }
-        ChangeEvent ev = new ChangeEvent((Object)this);
+        ChangeEvent ev = new ChangeEvent(this);
         while (it.hasNext()) {
-            ((ChangeListener)it.next()).stateChanged(ev);
+            it.next().stateChanged(ev);
         }
     }
 
+    @Override
     public void readSettings(Object settings) {
-        this.wizardDescriptor = (WizardDescriptor)settings;
-        this.component.read(this.wizardDescriptor);
-        Object substitute = this.component.getClientProperty("NewProjectWizard_Title");
+        wizardDescriptor = (WizardDescriptor)settings;
+        component.read(wizardDescriptor);
+        Object substitute = component.getClientProperty("NewProjectWizard_Title");
         if (substitute != null) {
-            this.wizardDescriptor.putProperty("NewProjectWizard_Title", substitute);
+            wizardDescriptor.putProperty("NewProjectWizard_Title", substitute);
         }
     }
 
+    @Override
     public void storeSettings(Object settings) {
         WizardDescriptor d = (WizardDescriptor)settings;
-        this.component.store(d);
+        component.store(d);
         d.putProperty("NewProjectWizard_Title", null);
     }
 
+    @Override
     public void validate() throws WizardValidationException {
-        this.getComponent();
-        this.component.validate(this.wizardDescriptor);
+        getComponent();
+        component.validate(wizardDescriptor);
     }
 
     public void enableComponents(boolean enable) {
         this.getComponent();
-        this.component.enableComponents(enable);
+        component.enableComponents(enable);
     }
 
     public String getURLPattern() {
-        return this.component.getURLPattern();
+        return component.getURLPattern();
     }
 
     public void setURLPattern(String pattern) {
-        this.component.setURLPattern(pattern);
+        component.setURLPattern(pattern);
     }
 
     public String getWicketVersion() {
-        return this.component.getWicketVersion();
+        return component.getWicketVersion();
     }
 
     public String getServletName() {
-        return this.component.getServletName();
+        return component.getServletName();
     }
 
     public void setServletName(String name) {
-        this.component.setServletName(name);
+        component.setServletName(name);
     }
 
     public String getAppResource() {
-        return this.component.getAppResource();
+        return component.getAppResource();
     }
 
     public void setAppResource(String resource) {
-        this.component.setAppResource(resource);
+        component.setAppResource(resource);
     }
 
     public String getPkgResource() {
-        return this.component.getPkgResource();
+        return component.getPkgResource();
     }
 
     void setPkgResource(String resource) {
-        this.component.setPkgResource(resource);
+        component.setPkgResource(resource);
     }
 
     public String getWebPageResource() {
-        return this.component.getWebPageResource();
+        return component.getWebPageResource();
     }
 
     void setWebPageResource(String resource) {
-        this.component.setWebPageResource(resource);
+        component.setWebPageResource(resource);
     }
 
     public File getInstallFolder() {
-        return this.component.getInstallFolder();
+        return component.getInstallFolder();
     }
 
     protected void setErrorMessage(String message) {
-        if (this.error_message != null && (message == null || "".equals(message))) {
-            this.wizardDescriptor.putProperty("WizardPanel_errorMessage", (Object)"");
-            this.error_message = null;
+        if (error_message != null && (message == null || "".equals(message))) {
+            wizardDescriptor.putProperty("WizardPanel_errorMessage", (Object)"");
+            error_message = null;
         } else {
-            this.error_message = message;
+            error_message = message;
         }
-        this.fireChangeEvent();
+        fireChangeEvent();
     }
 
+    @Override
     public void update() {
     }
 
+    @Override
     public Set extend(WebModule webModule) {
-        return this.framework.extendImpl(webModule);
+        return framework.extendImpl(webModule);
     }
 
     public ExtenderController getController() {
-        return this.controller;
+        return controller;
     }
 }

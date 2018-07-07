@@ -16,7 +16,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import javax.swing.AbstractListModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
@@ -31,7 +30,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
+import javax.swing.ListModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
@@ -57,7 +58,10 @@ import org.xml.sax.SAXException;
  */
 public class WicketConfigurationPanelVisual extends JPanel implements HelpCtx.Provider, DocumentListener {
 
+    private static final long serialVersionUID = 1L;
+
     private final WicketWebModuleExtender extender;
+    private final WicketFrameworkProvider framework;
 
     /**
      * Creates new form WicketConfigurationPanelVisual
@@ -69,27 +73,13 @@ public class WicketConfigurationPanelVisual extends JPanel implements HelpCtx.Pr
      */
     public WicketConfigurationPanelVisual(WicketWebModuleExtender extender, WicketFrameworkProvider framework, boolean enableComponents) {
         this.extender = extender;
+        this.framework = framework;
         initComponents();
         this.refreshPanels();
         this.jTextFieldAppResource.getDocument().addDocumentListener(this);
-        ((JTextComponent)this.jComboBoxURLPattern.getEditor().getEditorComponent()).getDocument().addDocumentListener(this);
+        ((JTextComponent)jComboBoxURLPattern.getEditor().getEditorComponent()).getDocument().addDocumentListener(this);
         this.enableComponents(enableComponents);
-        DefaultListModel<String> versionModel = new DefaultListModel<String>();
-        FileObject versionFo = FileUtil.getConfigFile((String)"org-netbeans-api-project-libraries/Libraries");
-        if (versionFo != null) {
-            FileObject[] versionKids = versionFo.getChildren();
-            for (FileObject versionKid : FileUtil.getOrder(Arrays.asList(versionKids), (boolean)true)) {
-                if (!versionKid.getName().startsWith("Wicket")) {
-                    continue;
-                }
-                try {
-                    String libraryName = this.parseFile(versionKid.getInputStream());
-                    versionModel.add(0, libraryName);
-                } catch (FileNotFoundException ex) {
-                    Exceptions.printStackTrace((Throwable)ex);
-                }
-            }
-            this.versionList.setModel(versionModel);
+        if (versionList.getModel().getSize() > 0) {
             this.versionList.setSelectedIndex(0);
         }
     }
@@ -146,11 +136,7 @@ public class WicketConfigurationPanelVisual extends JPanel implements HelpCtx.Pr
 
         Mnemonics.setLocalizedText(jLabel1, NbBundle.getMessage(WicketConfigurationPanelVisual.class, "WicketConfigurationPanelVisual.jLabel1.text")); // NOI18N
 
-        versionList.setModel(new AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
+        versionList.setModel(createWicketLibrariesListModel());
         versionList.setDropMode(DropMode.ON);
         jScrollPane1.setViewportView(versionList);
 
@@ -271,35 +257,43 @@ public class WicketConfigurationPanelVisual extends JPanel implements HelpCtx.Pr
 
     private void jbBrowseActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jbBrowseActionPerformed
         JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle(NbBundle.getMessage(WicketConfigurationPanelVisual.class, (String)"LBL_SelectLibraryLocation"));
+        chooser.setDialogTitle(NbBundle.getMessage(WicketConfigurationPanelVisual.class, "LBL_SelectLibraryLocation"));
         chooser.setFileSelectionMode(1);
-        if (0 == chooser.showOpenDialog(this)) {
+        if (JFileChooser.APPROVE_OPTION == chooser.showOpenDialog(this)) {
             File projectDir = chooser.getSelectedFile();
-            this.jtFolder.setText(projectDir.getAbsolutePath());
-            this.checkFolderInstallation();
+            jtFolder.setText(projectDir.getAbsolutePath());
+            checkFolderInstallation();
         }
     }//GEN-LAST:event_jbBrowseActionPerformed
 
     private void checkFolderInstallation() {
-        File folder = new File(this.jtFolder.getText());
+        File folder = new File(jtFolder.getText());
         if (!WicketConfigUtilities.isWicketInstallFolder(folder)) {
-            this.extender.setErrorMessage(NbBundle.getMessage(WicketConfigurationPanelVisual.class, (String)"MSG_PathIsNotWicketFolder"));
+            extender.setErrorMessage(NbBundle.getMessage(WicketConfigurationPanelVisual.class, "MSG_PathIsNotWicketFolder"));
         } else {
-            this.extender.setErrorMessage(null);
-            this.jpLibrary.setVisible(false);
-            this.jpSetup.setVisible(true);
+            try {
+                extender.setErrorMessage(null);
+                framework.addLibrary(jtFolder.getText());
+                versionList.setModel(createWicketLibrariesListModel());
+                if (versionList.getModel().getSize() > 0) {
+                    this.versionList.setSelectedIndex(0);
+                }
+                refreshPanels();
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
         }
     }
 
     private void refreshPanels() {
+        jpLibrary.setVisible(true);
+        jpSetup.setVisible(false);
         for (Library library : LibraryManager.getDefault().getLibraries()) {
             if (library.getName().startsWith("Wicket")) {
-                this.jpLibrary.setVisible(true);
-                this.jpSetup.setVisible(false);
-                continue;
+                jpLibrary.setVisible(false);
+                jpSetup.setVisible(true);
+                break;
             }
-            this.jpLibrary.setVisible(false);
-            this.jpSetup.setVisible(true);
         }
     }
 
@@ -350,7 +344,7 @@ public class WicketConfigurationPanelVisual extends JPanel implements HelpCtx.Pr
     }
 
     public String getWicketVersion() {
-        return (String)this.versionList.getSelectedValue();
+        return versionList.getSelectedValue();
     }
 
     public String getServletName() {
@@ -408,7 +402,7 @@ public class WicketConfigurationPanelVisual extends JPanel implements HelpCtx.Pr
     private String parseFile(InputStream is) {
         String name = "---";
         try {
-            org.w3c.dom.Document doc = XMLUtil.parse((InputSource)new InputSource(is), (boolean)true, (boolean)true, null, null);
+            org.w3c.dom.Document doc = XMLUtil.parse(new InputSource(is), true, true, null, null);
             NodeList allNodes = doc.getElementsByTagName("*");
             for (int i = 0; i < allNodes.getLength(); ++i) {
                 Node oneNode = allNodes.item(i);
@@ -424,6 +418,24 @@ public class WicketConfigurationPanelVisual extends JPanel implements HelpCtx.Pr
         return name;
     }
 
+    private ListModel<String> createWicketLibrariesListModel() {
+        DefaultListModel<String> librariesListModel = new DefaultListModel<>();
+        FileObject versionFo = FileUtil.getConfigFile("org-netbeans-api-project-libraries/Libraries");
+        if (versionFo != null) {
+            FileObject[] versionKids = versionFo.getChildren();
+            for (FileObject versionKid : FileUtil.getOrder(Arrays.asList(versionKids), (boolean)true)) {
+                if (versionKid.getName().startsWith("Wicket")) {
+                    try {
+                        String libraryName = this.parseFile(versionKid.getInputStream());
+                        librariesListModel.add(0, libraryName);
+                    } catch (FileNotFoundException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                }
+            }
+        }
+        return librariesListModel;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JComboBox<String> jComboBoxURLPattern;

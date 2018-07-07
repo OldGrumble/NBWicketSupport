@@ -7,22 +7,30 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.URL;
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import org.netbeans.api.java.project.classpath.ProjectClassPathModifier;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.SourceGroupModifier;
+import org.netbeans.api.project.Sources;
 import org.netbeans.api.project.libraries.Library;
 import org.netbeans.api.project.libraries.LibraryManager;
 import org.netbeans.modules.j2ee.dd.api.common.InitParam;
@@ -35,6 +43,8 @@ import org.netbeans.modules.web.api.webmodule.ExtenderController;
 import org.netbeans.modules.web.api.webmodule.WebModule;
 import org.netbeans.modules.web.spi.webmodule.WebFrameworkProvider;
 import org.netbeans.modules.web.spi.webmodule.WebModuleExtender;
+import org.netbeans.spi.project.libraries.LibraryTypeProvider;
+import org.netbeans.spi.project.libraries.support.LibrariesSupport;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.openide.ErrorManager;
 import org.openide.cookies.OpenCookie;
@@ -46,6 +56,7 @@ import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
 import org.openide.util.MapFormat;
 import org.openide.util.NbBundle;
+import org.openide.util.Utilities;
 
 /**
  *
@@ -57,27 +68,23 @@ public class WicketFrameworkProvider extends WebFrameworkProvider {
     private static final String defaultPkgResource = "com.myapp.wicket";
     private static String defaultWebPageResource = "HomePage";
     private WicketWebModuleExtender panel;
-    private Project project;
 
     public WicketFrameworkProvider() {
-        super(NbBundle.getMessage(WicketFrameworkProvider.class, (String)"Wicket_Name"), NbBundle.getMessage(WicketFrameworkProvider.class, (String)"Wicket_Description"));
+        super(NbBundle.getMessage(WicketFrameworkProvider.class, "Wicket_Name"), NbBundle.getMessage(WicketFrameworkProvider.class, "Wicket_Description"));
     }
 
     public Set extendImpl(WebModule webModule) {
         HashSet result = new HashSet();
         try {
             FileObject webInf;
-            FileObject fileObject = webModule.getDocumentBase();
-            this.project = FileOwnerQuery.getOwner((FileObject)fileObject);
-            FileObject[] javaSources = webModule.getJavaSources();
-            String libName = "";
-            libName = this.panel.getWicketVersion() != null ? this.panel.getWicketVersion() : this.panel.getComponent().getWicketVersion();
+            FileObject[] javaSources = getJavaSources(webModule);
+            String libName = panel.getWicketVersion() != null ? panel.getWicketVersion() : panel.getComponent().getWicketVersion();
             Library lib = LibraryManager.getDefault().getLibrary(libName);
             if (lib != null) {
-                ProjectClassPathModifier.addLibraries((Library[])new Library[]{lib}, (FileObject)javaSources[0], (String)"classpath/compile");
+                ProjectClassPathModifier.addLibraries((Library[])new Library[]{lib}, javaSources[0], "classpath/compile");
             }
             if ((webInf = webModule.getWebInf()) == null) {
-                webInf = FileUtil.createFolder((FileObject)webModule.getDocumentBase(), (String)"WEB-INF");
+                webInf = FileUtil.createFolder((FileObject)webModule.getDocumentBase(), "WEB-INF");
             }
             assert (webInf != null);
             FileSystem fileSystem = webInf.getFileSystem();
@@ -88,6 +95,63 @@ public class WicketFrameworkProvider extends WebFrameworkProvider {
         return result;
     }
 
+    void addLibrary(String pathToWicketFolder) throws FileNotFoundException, IOException {
+        final String coreLibPrefix = "wicket-core-";
+        final String jarFileSuffix = ".jar";
+        final File wicketDir = new File(pathToWicketFolder);
+        if (!wicketDir.exists()) {
+            throw new FileNotFoundException();
+        }
+        if (!wicketDir.isDirectory()) {
+            throw new IOException();
+        }
+        File[] files = wicketDir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                try {
+                    return dir.getCanonicalFile().equals(wicketDir.getCanonicalFile()) && name.startsWith(coreLibPrefix) && name.endsWith(jarFileSuffix);
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                    return false;
+                }
+            }
+        });
+        if (files.length != 1) {
+            throw new IOException();
+        }
+        LibraryTypeProvider[] providers = LibrariesSupport.getLibraryTypeProviders();
+        for (LibraryTypeProvider provider : providers) {
+            System.out.println("ProviderType: " + provider + ", '" + provider.getLibraryType() + "', " + provider.getDisplayName());
+            String[] supportedVolumeTypes = provider.getSupportedVolumeTypes();
+            System.out.println("supportedVolumeTypes = " + Arrays.asList(supportedVolumeTypes));
+        }
+        System.out.println();
+//        J2SELibraryTypeProvider jp;
+        String libName = files[0].getName();
+        String version = libName.substring(coreLibPrefix.length(), libName.length() - jarFileSuffix.length());
+        Map<String, List<URL>> contents = new TreeMap<>();
+        String volume = "classpath";
+        files = wicketDir.listFiles((File dir, String name1) -> {
+            try {
+                return dir.getCanonicalFile().equals(wicketDir.getCanonicalFile()) && name1.endsWith(jarFileSuffix);
+            }catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+                return false;
+            }
+        });
+        List<URL> list;
+        for (File file : files) {
+            list = contents.get(volume);
+            if (list == null) {
+                list = new ArrayList<>();
+                contents.put(volume, list);
+            }
+            list.add(Utilities.toURI(file).toURL());
+        }
+        LibraryManager.getDefault().createLibrary("j2se", "Wicket " + version, contents);
+    }
+
+    @Override
     public boolean isInWebModule(WebModule webModule) {
         FileObject dd = webModule.getDeploymentDescriptor();
         return dd != null && WicketConfigUtilities.getWicketFilter(dd) != null;
@@ -107,10 +171,12 @@ public class WicketFrameworkProvider extends WebFrameworkProvider {
         return sb.toString();
     }
 
+    @Override
     public File[] getConfigurationFiles(WebModule webModule) {
         return null;
     }
 
+    @Override
     public WebModuleExtender createWebModuleExtender(WebModule wm, ExtenderController controller) {
         boolean useDefaultValue = wm == null || !this.isInWebModule(wm);
         this.panel = new WicketWebModuleExtender(this, controller, useDefaultValue);
@@ -154,20 +220,14 @@ public class WicketFrameworkProvider extends WebFrameworkProvider {
      */
     public static void storeProperties(FileObject propsFO, EditableProperties props) throws IOException {
         FileLock lock = propsFO.lock();
-        try {
-            OutputStream os = propsFO.getOutputStream(lock);
-            try {
-                props.store(os);
-            } finally {
-                os.close();
-            }
+        try (OutputStream os = propsFO.getOutputStream(lock)) {
+            props.store(os);
         } finally {
             lock.releaseLock();
         }
     }
 
-    private class CreateWicketFiles
-            implements FileSystem.AtomicAction {
+    private class CreateWicketFiles implements FileSystem.AtomicAction {
 
         WebModule wm;
 
@@ -180,22 +240,21 @@ public class WicketFrameworkProvider extends WebFrameworkProvider {
          */
         private void createFile(FileObject target, String content, String encoding) throws IOException {
             FileLock lock = target.lock();
-            try {
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(target.getOutputStream(lock), encoding));
+            try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(target.getOutputStream(lock), encoding))) {
                 bw.write(content);
-                bw.close();
             } finally {
                 lock.releaseLock();
             }
         }
 
+        @Override
         public void run() throws IOException {
             try {
                 FileObject targetResFolder;
                 OpenCookie openJavaHomePage;
                 DataObject javaHomePage;
                 String content = WicketFrameworkProvider.readResource(FileUtil.getConfigFile((String)"org-netbeans-modules-web-wicket-template/WicketApplication.template").getInputStream(), "UTF-8");
-                HashMap<String, String> args = new HashMap<String, String>();
+                HashMap<String, String> args = new HashMap<>();
                 args.put("USER", System.getProperty("user.name"));
                 args.put("NAME", WicketFrameworkProvider.this.panel.getAppResource().replace('.', '/'));
                 args.put("DATE", DateFormat.getDateInstance(1).format(new Date()));
@@ -209,7 +268,7 @@ public class WicketFrameworkProvider extends WebFrameworkProvider {
                 formater.setExactMatch(false);
                 content = formater.format((Object)content);
                 Project project = FileOwnerQuery.getOwner((FileObject)this.wm.getDocumentBase());
-                SourceGroup[] sourceGroups = ProjectUtils.getSources((Project)project).getSourceGroups("java");
+                SourceGroup[] sourceGroups = ProjectUtils.getSources(project).getSourceGroups("java");
                 String path = WicketFrameworkProvider.this.panel.getPkgResource();
                 String name = WicketFrameworkProvider.this.panel.getAppResource();
                 name = name + ".java";
@@ -220,7 +279,7 @@ public class WicketFrameworkProvider extends WebFrameworkProvider {
                 }
                 FileObject target = FileUtil.createData((FileObject)targetFolder, (String)name);
                 this.createFile(target, content, "UTF-8");
-                SourceGroup resGroup = SourceGroupModifier.createSourceGroup((Project)project, (String)"resources", (String)"main");
+                SourceGroup resGroup = SourceGroupModifier.createSourceGroup(project, (String)"resources", (String)"main");
                 if (resGroup != null) {
                     targetResFolder = resGroup.getRootFolder();
                     String pth = path.replace('.', '/');
@@ -300,7 +359,7 @@ public class WicketFrameworkProvider extends WebFrameworkProvider {
                 target = FileUtil.createData((FileObject)targetResFolder, (String)style_css);
                 this.createFile(target, content, "UTF-8");
                 FileObject documentBase2 = this.wm.getDocumentBase();
-                project = FileOwnerQuery.getOwner((FileObject)documentBase2);
+                project = FileOwnerQuery.getOwner(documentBase2);
                 if (projectprop != null) {
                     EditableProperties ep = WicketFrameworkProvider.loadProperties(projectprop);
                     ep.setProperty("client.urlPart", WicketFrameworkProvider.this.panel.getURLPattern().replace("/*", ""));
@@ -309,12 +368,26 @@ public class WicketFrameworkProvider extends WebFrameworkProvider {
                 if ((openJavaHomePage = (OpenCookie)(javaHomePage = DataObject.find((FileObject)fileToOpen)).getCookie(OpenCookie.class)) != null) {
                     openJavaHomePage.open();
                 }
-            } catch (FileNotFoundException ex) {
-                ex.printStackTrace();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                Exceptions.printStackTrace(ex);
             }
         }
     }
 
+    /**
+     * This method replaces deprecated method in WebModule.
+     *
+     * @return source roots.
+     */
+    private FileObject[] getJavaSources(WebModule webModule) {
+        FileObject docBase = webModule.getDocumentBase();
+        Project project = FileOwnerQuery.getOwner(docBase);
+        Sources sources = ProjectUtils.getSources(project);
+        SourceGroup[] sourceGroups = sources.getSourceGroups("java");
+        FileObject[] javaSources = new FileObject[sourceGroups.length];
+        for (int i = 0; i < sourceGroups.length; i++) {
+            javaSources[i] = sourceGroups[i].getRootFolder();
+        }
+        return javaSources;
+    }
 }
