@@ -25,28 +25,33 @@ import org.openide.windows.WindowManager;
  */
 public class Installer extends ModuleInstall {
 
-    /**
-     * TODO: Probably this installs/opens some demo project?
-     */
-    private class DemoRunnable implements Runnable {
+    private static final long serialVersionUID = 1L;
 
-        private DemoRunnable() {
+    /**
+     * This class installs a PropertyChangeListener for opening the counterpart
+     * file when the run method is executed.
+     */
+    private class MatchingFileOpenerRunnable implements Runnable {
+
+        private MatchingFileOpenerRunnable() {
         }
 
         /**
-         * TODO: Could not find out, when the Runnable is started and what's its
-         * use.
+         * This method installs a PropertyChangeListener for opening the
+         * counterpart file.
          */
         @Override
         public void run() {
             WindowManager.getDefault().getRegistry().addPropertyChangeListener((PropertyChangeEvent evt) -> {
                 if (evt.getPropertyName().equals("opened")) {
-                    HashSet newHashSet = (HashSet)evt.getNewValue();
-                    HashSet oldHashSet = (HashSet)evt.getOldValue();
-                    Iterator it = newHashSet.iterator();
+                    // Execute only, if the PropertyChange was fired because of opening a TopComponent.
+                    HashSet<TopComponent> newHashSet = (HashSet<TopComponent>)evt.getNewValue();
+                    HashSet<TopComponent> oldHashSet = (HashSet<TopComponent>)evt.getOldValue();
+                    Iterator<TopComponent> it = newHashSet.iterator();
                     while (it.hasNext()) {
-                        TopComponent topComponent = (TopComponent)it.next();
+                        TopComponent topComponent = it.next();
                         if (!oldHashSet.contains(topComponent)) {
+                            // This TopComponent was not open before.
                             DataObject dObj = (DataObject)topComponent.getLookup().lookup(DataObject.class);
                             if (dObj != null) {
                                 FileObject currentFile = dObj.getPrimaryFile();
@@ -54,11 +59,15 @@ public class Installer extends ModuleInstall {
                                     String mimeType = dObj.getPrimaryFile().getMIMEType();
                                     FileObject matchingFile = null;
                                     if (mimeType.equals(WicketSupportConstants.MIME_TYPE_HTML)) {
+                                        // A HTML file was opened; get Java counterpart if Wicket framework is used.
                                         matchingFile = JavaForMarkupQuery.find(currentFile);
                                     } else if (mimeType.equals(WicketSupportConstants.MIME_TYPE_JAVA)) {
+                                        // A Java file was opened; get HTML counterpart if Wicket framework is used
                                         matchingFile = MarkupForJavaQuery.find(currentFile);
                                     }
                                     if (matchingFile != null) {
+                                        // The TopWindow contains an editor for a file using Wicket framework,
+                                        // the counterpart is opened, too.
                                         try {
                                             DataObject matchingDobj = DataObject.find(matchingFile);
                                             OpenCookie oc = (OpenCookie)matchingDobj.getLookup().lookup(OpenCookie.class);
@@ -81,6 +90,6 @@ public class Installer extends ModuleInstall {
 
     @Override
     public void restored() {
-        WindowManager.getDefault().invokeWhenUIReady(new DemoRunnable());
+        WindowManager.getDefault().invokeWhenUIReady(new MatchingFileOpenerRunnable());
     }
 }
