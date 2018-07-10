@@ -273,5 +273,32 @@
             <artifactId>org-netbeans-libs-javacapi</artifactId>
             <version>RELEASE82</version>
         </dependency>
+<!-- The following dependencies are only needed for HTML editor support. -->
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-csl-api</artifactId>
+            <version>RELEASE82</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-html-editor</artifactId>
+            <version>RELEASE82</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-html-editor-lib</artifactId>
+            <version>RELEASE82</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-editor-completion</artifactId>
+            <version>RELEASE82</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-csl-types</artifactId>
+            <version>RELEASE82</version>
+        </dependency>
+<!-- The dependencies above are only needed for HTML editor support. -->
     </dependencies>
 </project>
