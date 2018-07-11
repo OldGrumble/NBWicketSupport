@@ -13,23 +13,23 @@ import java.util.Set;
 import org.netbeans.api.editor.mimelookup.MimeRegistration;
 import org.netbeans.api.editor.mimelookup.MimeRegistrations;
 import org.netbeans.modules.csl.api.ColoringAttributes;
-import org.netbeans.modules.csl.api.DeclarationFinder;
 import org.netbeans.modules.csl.api.OffsetRange;
-import org.netbeans.modules.csl.spi.ParserResult;
 import org.netbeans.modules.html.editor.api.gsf.CustomAttribute;
+import org.netbeans.modules.html.editor.api.gsf.CustomTag;
 import org.netbeans.modules.html.editor.api.gsf.HtmlExtension;
 import org.netbeans.modules.html.editor.api.gsf.HtmlParserResult;
-import org.netbeans.modules.html.editor.lib.api.HelpItem;
 import org.netbeans.modules.html.editor.lib.api.HtmlSource;
 import org.netbeans.modules.html.editor.lib.api.elements.Attribute;
+import org.netbeans.modules.html.editor.lib.api.elements.Element;
+import org.netbeans.modules.html.editor.lib.api.elements.ElementType;
 import org.netbeans.modules.html.editor.lib.api.elements.Named;
+import org.netbeans.modules.html.editor.lib.api.elements.OpenTag;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
 import org.netbeans.modules.web.wicket.editor.model.WicketNodeType;
 import org.netbeans.modules.web.wicket.editor.model.WicketNodesExtractor;
 import org.netbeans.modules.web.wicket.editor.model.WicketNodesModel;
 import org.netbeans.modules.web.wicket.editor.model.WicketToken;
 import org.netbeans.spi.editor.completion.CompletionItem;
-import org.openide.filesystems.FileObject;
 
 /**
  * This class extends HTML syntax, so wicket additions are not flagged as
@@ -43,6 +43,11 @@ import org.openide.filesystems.FileObject;
     @MimeRegistration(mimeType = "text/html", service = HtmlExtension.class)
 })
 public class WicketHtmlExtension extends HtmlExtension {
+
+    private Collection<CustomTag> tags;
+
+    public WicketHtmlExtension() {
+    }
 
     @Override
     public boolean isApplicationPiece(HtmlParserResult result) {
@@ -62,17 +67,45 @@ public class WicketHtmlExtension extends HtmlExtension {
         return highlights;
     }
 
-//    @Override
-//    public List<CompletionItem> completeAttributes(CompletionContext context) {
-//        List<CompletionItem> items = new ArrayList<>();
-//        return items;
-//    }
-//
-//    @Override
-//    public List<CompletionItem> completeAttributeValue(CompletionContext context) {
-//        List<CompletionItem> items = new ArrayList<>();
-//        return items;
-//    }
+    @Override
+    public List<CompletionItem> completeOpenTags(CompletionContext context) {
+        List<CompletionItem> items = new ArrayList<>();
+        Collection<CustomTag> customTags = getCustomTags();
+        for (CustomTag customTag : customTags) {
+            items.add(new WicketTagCompletionItem(customTag.getName(), context.getCCItemStartOffset()));
+        }
+        return items;
+    }
+
+    @Override
+    public List<CompletionItem> completeAttributes(CompletionContext context) {
+        List<CompletionItem> items = new ArrayList<>();
+        Element node = context.getCurrentNode();
+        if (node.type() == ElementType.OPEN_TAG) {
+            OpenTag tag = (OpenTag)node;
+            Collection<CustomAttribute> customAttributes = getCustomAttributes(tag.name().toString());
+            for (CustomAttribute customAttribute : customAttributes) {
+                items.add(new WicketAttributeCompletionItem(customAttribute.getName(), context.getCCItemStartOffset(), customAttribute.isRequired(), customAttribute.getHelp()));
+            }
+        }
+        return items;
+    }
+
+    @Override
+    public List<CompletionItem> completeAttributeValue(CompletionContext context) {
+        List<CompletionItem> items = new ArrayList<>();
+        Element node = context.getCurrentNode();
+        if (node.type() == ElementType.OPEN_TAG) {
+            OpenTag tag = (OpenTag)node;
+            if ("html".equals(tag.name().toString().toLowerCase())) {
+                String attributeName = context.getAttributeName();
+                if ("xmlns:wicket".equals(attributeName)) {
+                    items.add(new WicketAttributeValueCompletionItem("http://wicket.apache.org", context.getCCItemStartOffset()));
+                }
+            }
+        }
+        return items;
+    }
 
     @Override
     public boolean isCustomAttribute(Attribute attribute, HtmlSource source) {
@@ -81,34 +114,21 @@ public class WicketHtmlExtension extends HtmlExtension {
 //        String tagName = attribute.unqualifiedName().toString();
 //        String value = attribute.value().toString();
 //        System.out.println("Found Attribute: " + tagNSName + ", " + tagNS + ", " + tagName + ", " + value);
-        return tagNSName.startsWith("wicket:");
+        return tagNSName.startsWith("wicket:") || "xmlns:wicket".equals(tagNSName);
     }
 
     @Override
     public Collection<CustomAttribute> getCustomAttributes(String elementName) {
-        return Arrays.asList(new CustomAttribute[]{
-            new CustomAttribute() {
-                @Override
-                public String getName() {
-                    return "wicket:id";
-                }
-
-                @Override
-                public boolean isRequired() {
-                    return false;
-                }
-
-                @Override
-                public boolean isValueRequired() {
-                    return true;
-                }
-
-                @Override
-                public HelpItem getHelp() {
-                    return null;
-                }
-            }
-        });
+        switch (elementName) {
+            case "html":
+                return Arrays.asList(new CustomAttribute[]{
+                    new WicketCustomAttribute("xmlns:wicket")
+                });
+            default:
+                return Arrays.asList(new CustomAttribute[]{
+                    new WicketCustomAttribute("id")
+                });
+        }
     }
 
     @Override
@@ -125,6 +145,14 @@ public class WicketHtmlExtension extends HtmlExtension {
 //        }
 //        System.out.println("Found Tag: " + tagNSName + ", " + tagNS + ", " + tagName + ", " + tagType.name() + ", " + attributes);
         return tagNSName.startsWith("wicket:");
+    }
+
+    @Override
+    public Collection<CustomTag> getCustomTags() {
+        if (tags == null) {
+            tags = WicketCustomTagsFactory.createAll();
+        }
+        return tags;
     }
 
 //    @Override
