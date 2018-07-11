@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import org.netbeans.api.html.lexer.HTMLTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
@@ -18,12 +19,12 @@ import org.netbeans.api.lexer.TokenSequence;
  */
 public class HtmlTreeBuilder {
 
-    private final Document doc;
+    private final AbstractDocument doc;
     private MarkupContainerTree<String> tree;
     private Map<String, Set<TagVisitor>> visitors;
 
     public HtmlTreeBuilder(Document doc) {
-        this.doc = doc;
+        this.doc = (AbstractDocument)doc;
     }
 
     public void addTagVistor(String tagType, TagVisitor visitor) {
@@ -32,10 +33,10 @@ public class HtmlTreeBuilder {
             throw new IllegalStateException("Adding a TagVisitor after the parse has already run");
         }
         if (this.visitors == null) {
-            this.visitors = new HashMap<String, Set<TagVisitor>>();
+            this.visitors = new HashMap<>();
         }
         if ((s = this.visitors.get(tagType)) == null) {
-            s = new HashSet<TagVisitor>();
+            s = new HashSet<>();
             this.visitors.put(tagType, s);
         }
         s.add(visitor);
@@ -49,12 +50,17 @@ public class HtmlTreeBuilder {
     }
 
     private MarkupContainerTree<String> analyze() {
-        MarkupContainerTree<String> result = new MarkupContainerTree<String>();
-        TokenHierarchy hi = TokenHierarchy.get((Document)this.doc);
-        assert (hi != null);
-        TokenSequence ts = hi.tokenSequence(HTMLTokenId.language());
-        HTMLTagContentsParser p = new HTMLTagContentsParser(result.getRoot());
-        p.parse((TokenSequence<HTMLTokenId>)ts, this.visitors);
+        MarkupContainerTree<String> result = new MarkupContainerTree<>();
+        doc.readLock();
+        try {
+            TokenHierarchy hi = TokenHierarchy.get(doc);
+            assert (hi != null);
+            TokenSequence ts = hi.tokenSequence(HTMLTokenId.language());
+            HTMLTagContentsParser p = new HTMLTagContentsParser(result.getRoot());
+            p.parse((TokenSequence<HTMLTokenId>)ts, this.visitors);
+        } finally {
+            doc.readUnlock();
+        }
         return result;
     }
 
@@ -68,5 +74,4 @@ public class HtmlTreeBuilder {
 
         public void tagClosed(int var1);
     }
-
 }
