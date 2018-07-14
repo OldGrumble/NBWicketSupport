@@ -3,16 +3,15 @@
  */
 package org.netbeans.modules.web.wicket.palette.label;
 
-import com.sun.source.util.TreePathScanner;
 import java.io.IOException;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.java.source.CompilationController;
-import org.netbeans.api.java.source.CompilationInfo;
 import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.Task;
 import org.netbeans.api.wicket.JavaForMarkupQuery;
-import org.netbeans.modules.web.wicket.palette.Utilities;
+import org.netbeans.modules.web.wicket.palette.util.AddInvocationToConstructorTask;
+import org.netbeans.modules.web.wicket.palette.util.PaletteSupportUtilities;
 import org.netbeans.spi.palette.PaletteItemRegistration;
 import org.openide.filesystems.FileObject;
 import org.openide.text.ActiveEditorDrop;
@@ -44,37 +43,27 @@ public class Label implements ActiveEditorDrop {
     @Override
     public boolean handleTransfer(JTextComponent targetComponent) {
         LabelCustomizer c = new LabelCustomizer(this, targetComponent);
-        boolean accept = c.showDialog();
-        if (accept) {
+        if (c.showDialog()) {
             try {
-                String body = "\n<span wicket:id=\"" + this.getWicketId() + "\">" + this.getPlaceholderText() + "</span>\n";
-                FileObject javaFo = JavaForMarkupQuery.find(Utilities.getFileObject(targetComponent));
-                final JavaSource source = JavaSource.forFileObject((FileObject)javaFo);
-                source.runUserActionTask(new Task<CompilationController>() {
-
-                    @Override
-                    public void run(CompilationController compilationController) throws Exception {
-                        compilationController.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED);
-
-                        TreePathScanner<Void, Void> scanner = new Utilities.AddInvocationToConstructor(
-                                source,
-                                (CompilationInfo)compilationController,
-                                "new Label(\"" + Label.this.getWicketId() + "\", \"" + Label.this.getInitialValue() + "\")"
-                        );
-                        scanner.scan(compilationController.getCompilationUnit(), null);
-                    }
-                }, true);
-                Utilities.insert(body, targetComponent);
+                FileObject javaFo = JavaForMarkupQuery.find(PaletteSupportUtilities.getFileObject(targetComponent));
+                final JavaSource source = JavaSource.forFileObject(javaFo);
+                if (source != null) {
+                    String htmlText = "\n<span wicket:id=\"" + wicketId + "\">" + placeholderText + "</span>\n";
+                    String javaText = "new Label(\"" + wicketId + "\", \"" + initialValue + "\")";
+                    Task<CompilationController> task = new AddInvocationToConstructorTask(source, javaText);
+                    source.runUserActionTask(task, true);
+                    PaletteSupportUtilities.insert(htmlText, targetComponent);
+                    return true;
+                }
             } catch (BadLocationException | IOException ex) {
-                Exceptions.printStackTrace((Throwable)ex);
-                accept = false;
+                Exceptions.printStackTrace(ex);
             }
         }
-        return accept;
+        return false;
     }
 
     public String getWicketId() {
-        return this.wicketId;
+        return wicketId;
     }
 
     public void setWicketId(String wicketId) {
@@ -82,7 +71,7 @@ public class Label implements ActiveEditorDrop {
     }
 
     public String getPlaceholderText() {
-        return this.placeholderText;
+        return placeholderText;
     }
 
     public void setPlaceholderText(String placeholderText) {
@@ -90,11 +79,10 @@ public class Label implements ActiveEditorDrop {
     }
 
     public String getInitialValue() {
-        return this.initialValue;
+        return initialValue;
     }
 
     public void setInitialValue(String initialValue) {
         this.initialValue = initialValue;
     }
-
 }

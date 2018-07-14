@@ -9,7 +9,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.java.source.*;
 import org.netbeans.api.wicket.JavaForMarkupQuery;
-import org.netbeans.modules.web.wicket.palette.Utilities;
+import org.netbeans.modules.web.wicket.palette.util.AddInvocationToConstructor;
+import org.netbeans.modules.web.wicket.palette.util.AddInvocationToConstructorTask;
+import org.netbeans.modules.web.wicket.palette.util.PaletteSupportUtilities;
 import org.netbeans.spi.palette.PaletteItemRegistration;
 import org.openide.filesystems.FileObject;
 import org.openide.text.ActiveEditorDrop;
@@ -23,11 +25,11 @@ import org.openide.util.Exceptions;
         paletteid = "HTMLPalette",
         category = "Wicket",
         itemid = "DropDown",
-//        name = "#NAME_wicket-dropdown",
+        //        name = "#NAME_wicket-dropdown",
         name = "DropDown List",
         icon16 = "org/netbeans/modules/web/wicket/palette/dropdown/dropdown_16.png",
         icon32 = "org/netbeans/modules/web/wicket/palette/dropdown/dropdown_32.png",
-//        tooltip = "#HINT_wicket-dropdown"
+        //        tooltip = "#HINT_wicket-dropdown"
         tooltip = "<html>dropdown</html>"
 )
 public class DropDown implements ActiveEditorDrop {
@@ -40,32 +42,18 @@ public class DropDown implements ActiveEditorDrop {
 
     @Override
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String body = HTML;
         try {
-            FileObject javaFo = JavaForMarkupQuery.find(Utilities.getFileObject(targetComponent));
+            FileObject javaFo = JavaForMarkupQuery.find(PaletteSupportUtilities.getFileObject(targetComponent));
             final JavaSource source = JavaSource.forFileObject(javaFo);
-            try {
-                source.runUserActionTask(new Task<CompilationController>() {
-
-                    @Override
-                    public void run(CompilationController compilationController) throws Exception {
-                        compilationController.toPhase(org.netbeans.api.java.source.JavaSource.Phase.ELEMENTS_RESOLVED);
-
-                        TreePathScanner<Void, Void> scanner = new Utilities.AddInvocationToConstructor(
-                                source,
-                                compilationController,
-                                JAVA
-                        );
-                        scanner.scan(compilationController.getCompilationUnit(), null);
-                    }
-                }, true);
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
+            if (source != null) {
+                Task<CompilationController> task = new AddInvocationToConstructorTask(source, JAVA);
+                source.runUserActionTask(task, true);
+                PaletteSupportUtilities.insert(HTML, targetComponent);
+                return true;
             }
-            Utilities.insert(body, targetComponent);
-        } catch (BadLocationException ble) {
-            return false;
+        } catch (BadLocationException | IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
-        return true;
+        return false;
     }
 }
