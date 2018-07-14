@@ -14,10 +14,9 @@ import org.netbeans.modules.web.wicket.tree.MarkupContainerTree;
 import org.netbeans.modules.web.wicket.tree.Node;
 import org.netbeans.modules.web.wicket.tree.diff.Change;
 import org.netbeans.modules.web.wicket.tree.diff.Diff;
-import org.openide.util.NbBundle;
 
 /**
- * 
+ *
  * @author Tim Boudreau
  */
 public final class TreeDiff {
@@ -60,14 +59,14 @@ public final class TreeDiff {
         if (htmlDups) {
             dups = this.findDuplicateIds(htmlNode);
             for (Node<String> dup : dups) {
-                p = new Problem(ProblemKind.DUPLICATE_HTML_IDS, null, dup, null, htmlNode);
+                p = new Problem(WicketSourceProblemKind.DUPLICATE_HTML_IDS, null, dup, null, htmlNode);
                 problems.add(p);
             }
         }
         if (javaDups) {
             dups = this.findDuplicateIds(javaNode);
             for (Node<String> dup : dups) {
-                p = new Problem(ProblemKind.DUPLICATE_JAVA_IDS, dup, null, javaNode, null);
+                p = new Problem(WicketSourceProblemKind.DUPLICATE_JAVA_IDS, dup, null, javaNode, null);
                 problems.add(p);
             }
         }
@@ -85,25 +84,25 @@ public final class TreeDiff {
             switch (c.getType()) {
                 case 1: {
                     for (int i = start; i <= end; ++i) {
-                        p2 = new Problem(ProblemKind.HTML_NODE_MISSING, javaNode.getChildren().get(i), null, javaNode, htmlNode);
+                        p2 = new Problem(WicketSourceProblemKind.HTML_NODE_MISSING, javaNode.getChildren().get(i), null, javaNode, htmlNode);
                         problems.add(p2);
-                        p2 = new Problem(ProblemKind.JAVA_NODE_ADDED, javaNode.getChildren().get(i), null, javaNode, htmlNode);
+                        p2 = new Problem(WicketSourceProblemKind.JAVA_NODE_ADDED, javaNode.getChildren().get(i), null, javaNode, htmlNode);
                         problems.add(p2);
                     }
                     continue;
                 }
                 case 2: {
                     for (int i = start; i <= end; ++i) {
-                        p2 = new Problem(ProblemKind.JAVA_NODE_MISSING, null, htmlNode.getChildren().get(i), javaNode, htmlNode);
+                        p2 = new Problem(WicketSourceProblemKind.JAVA_NODE_MISSING, null, htmlNode.getChildren().get(i), javaNode, htmlNode);
                         problems.add(p2);
-                        p2 = new Problem(ProblemKind.HTML_NODE_ADDED, null, htmlNode.getChildren().get(i), javaNode, htmlNode);
+                        p2 = new Problem(WicketSourceProblemKind.HTML_NODE_ADDED, null, htmlNode.getChildren().get(i), javaNode, htmlNode);
                         problems.add(p2);
                     }
                     continue;
                 }
                 case 0: {
                     for (int i = start; i <= end; ++i) {
-                        p2 = new Problem(ProblemKind.DIFFERENT_IDS, javaNode.getChildren().get(i), htmlNode.getChildren().get(i), javaNode, htmlNode);
+                        p2 = new Problem(WicketSourceProblemKind.DIFFERENT_IDS, javaNode.getChildren().get(i), htmlNode.getChildren().get(i), javaNode, htmlNode);
                         problems.add(p2);
                     }
                     break;
@@ -140,9 +139,9 @@ public final class TreeDiff {
         private final Node<String> problemHtmlNode;
         private final Node<String> problemParentJavaNode;
         private final Node<String> problemParentHtmlNode;
-        private final ProblemKind kind;
+        private final WicketSourceProblemKind kind;
 
-        public Problem(ProblemKind kind, Node<String> problemJavaNode, Node<String> problemHtmlNode, Node<String> problemParentJavaNode, Node<String> problemParentHtmlNode) {
+        public Problem(WicketSourceProblemKind kind, Node<String> problemJavaNode, Node<String> problemHtmlNode, Node<String> problemParentJavaNode, Node<String> problemParentHtmlNode) {
             this.problemJavaNode = problemJavaNode;
             this.problemHtmlNode = problemHtmlNode;
             this.problemParentJavaNode = problemParentJavaNode;
@@ -151,7 +150,7 @@ public final class TreeDiff {
             System.err.println("CREATE PROBLEM " + this);
         }
 
-        public ProblemKind getKind() {
+        public WicketSourceProblemKind getKind() {
             return this.kind;
         }
 
@@ -174,52 +173,52 @@ public final class TreeDiff {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            switch (this.getKind()) {
+            switch (kind) {
                 case DIFFERENT_IDS: {
-                    String problemParentId = this.problemParentHtmlNode.getId();
-                    String javaChildId = this.getProblemJavaNode().getId();
-                    String htmlChildId = this.getProblemHtmlNode().getId();
-                    sb.append(NbBundle.getMessage(Problem.class, (String)this.kind.name(), (Object)problemParentId, (Object)htmlChildId, (Object)javaChildId));
+                    String problemParentId = problemParentHtmlNode.getId();
+                    String javaChildId = getProblemJavaNode().getId();
+                    String htmlChildId = getProblemHtmlNode().getId();
+                    sb.append(kind.getMessage(problemParentId, htmlChildId, javaChildId));
                     break;
                 }
                 case DUPLICATE_HTML_IDS: {
-                    String problemParentId = this.getProblemParentHtmlNode().getId();
-                    String problemChildId = this.getProblemHtmlNode().getId();
-                    sb.append(NbBundle.getMessage(Problem.class, (String)this.kind.name(), (Object)problemParentId, (Object)problemChildId));
+                    String problemParentId = getProblemParentHtmlNode().getId();
+                    String problemChildId = getProblemHtmlNode().getId();
+                    sb.append(kind.getMessage(problemParentId, problemChildId));
                     break;
                 }
                 case DUPLICATE_JAVA_IDS: {
-                    String problemParentId = this.getProblemParentJavaNode().getId();
-                    String problemChildId = this.getProblemJavaNode().getId();
-                    sb.append(NbBundle.getMessage(Problem.class, (String)this.kind.name(), (Object)problemParentId, (Object)problemChildId));
+                    String problemParentId = getProblemParentJavaNode().getId();
+                    String problemChildId = getProblemJavaNode().getId();
+                    sb.append(kind.getMessage(problemParentId, problemChildId));
                     break;
                 }
                 case HTML_NODE_ADDED: {
-                    String problemParentId = this.getProblemParentHtmlNode().getId();
-                    String problemChildId = this.getProblemHtmlNode().getId();
-                    sb.append(NbBundle.getMessage(Problem.class, (String)this.kind.name(), (Object)problemParentId, (Object)problemChildId));
+                    String problemParentId = getProblemParentHtmlNode().getId();
+                    String problemChildId = getProblemHtmlNode().getId();
+                    sb.append(kind.getMessage(problemParentId, problemChildId));
                     break;
                 }
                 case JAVA_NODE_ADDED: {
-                    String problemParentId = this.getProblemParentJavaNode().getId();
-                    String problemChildId = this.getProblemJavaNode().getId();
-                    sb.append(NbBundle.getMessage(Problem.class, (String)this.kind.name(), (Object)problemParentId, (Object)problemChildId));
+                    String problemParentId = getProblemParentJavaNode().getId();
+                    String problemChildId = getProblemJavaNode().getId();
+                    sb.append(kind.getMessage(problemParentId, problemChildId));
                     break;
                 }
                 case JAVA_NODE_MISSING: {
-                    String problemParentId = this.getProblemParentJavaNode().getId();
-                    String problemChildId = this.getProblemHtmlNode().getId();
-                    sb.append(NbBundle.getMessage(Problem.class, (String)this.kind.name(), (Object)problemParentId, (Object)problemChildId));
+                    String problemParentId = getProblemParentJavaNode().getId();
+                    String problemChildId = getProblemHtmlNode().getId();
+                    sb.append(kind.getMessage(problemParentId, problemChildId));
                     break;
                 }
                 case HTML_NODE_MISSING: {
-                    String problemParentId = this.getProblemParentHtmlNode().getId();
-                    String problemChildId = this.getProblemJavaNode().getId();
-                    sb.append(NbBundle.getMessage(Problem.class, (String)this.kind.name(), (Object)problemParentId, (Object)problemChildId));
+                    String problemParentId = getProblemParentHtmlNode().getId();
+                    String problemChildId = getProblemJavaNode().getId();
+                    sb.append(kind.getMessage(problemParentId, problemChildId));
                     break;
                 }
                 default: {
-                    throw new AssertionError((Object)this.getKind().toString());
+                    throw new AssertionError(kind.toString());
                 }
             }
             if (ERR.isLoggable(Level.FINE)) {
@@ -232,39 +231,4 @@ public final class TreeDiff {
             return sb.toString();
         }
     }
-
-    public static enum ProblemKind {
-        HTML_NODE_MISSING,
-        JAVA_NODE_MISSING,
-        DUPLICATE_HTML_IDS,
-        DUPLICATE_JAVA_IDS,
-        HTML_NODE_ADDED,
-        JAVA_NODE_ADDED,
-        DIFFERENT_IDS;
-
-        private ProblemKind() {
-        }
-
-        public boolean isHtmlProblem() {
-            switch (this) {
-                case DIFFERENT_IDS: {
-                    return true;
-                }
-                case JAVA_NODE_ADDED:
-                case JAVA_NODE_MISSING:
-                case DUPLICATE_JAVA_IDS: {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        public boolean isJavaProblem() {
-            if (this == DIFFERENT_IDS) {
-                return true;
-            }
-            return !this.isHtmlProblem();
-        }
-    }
-
 }
