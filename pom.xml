@@ -24,6 +24,18 @@
                         <publicPackage>org.netbeans.api.wicket</publicPackage>
                         <publicPackage>org.netbeans.spi.wicket</publicPackage>
                     </publicPackages>
+                    <moduleDependencies>
+                        <dependency>
+                            <id>org.netbeans.modules:org-netbeans-modules-html-editor</id>
+                            <type>impl</type>
+                            <explicitValue>org-netbeans-modules-html-editor = 201609300101</explicitValue>
+                        </dependency>
+                        <dependency>
+                            <id>org.netbeans.modules:org-netbeans-modules-html-editor-lib</id>
+                            <type>impl</type>
+                            <explicitValue>org-netbeans-modules-html-editor = 201609300101</explicitValue>
+                        </dependency>
+                    </moduleDependencies>
                 </configuration>
             </plugin>
             <plugin>
@@ -273,20 +285,10 @@
             <artifactId>org-netbeans-libs-javacapi</artifactId>
             <version>RELEASE82</version>
         </dependency>
-<!-- The following dependencies are only needed for HTML editor support. -->
+        <!-- The following dependencies are only needed for HTML editor support. -->
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-csl-api</artifactId>
-            <version>RELEASE82</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-netbeans-modules-html-editor</artifactId>
-            <version>RELEASE82</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-netbeans-modules-html-editor-lib</artifactId>
             <version>RELEASE82</version>
         </dependency>
         <dependency>
@@ -299,6 +301,11 @@
             <artifactId>org-netbeans-modules-csl-types</artifactId>
             <version>RELEASE82</version>
         </dependency>
-<!-- The dependencies above are only needed for HTML editor support. -->
+        <!-- The dependencies above are only needed for HTML editor support. -->
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-spi-palette</artifactId>
+            <version>RELEASE82</version>
+        </dependency>
     </dependencies>
 </project>
