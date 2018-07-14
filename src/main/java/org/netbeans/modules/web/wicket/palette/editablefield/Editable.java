@@ -12,6 +12,7 @@ import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.Task;
 import org.netbeans.api.wicket.JavaForMarkupQuery;
 import org.netbeans.modules.web.wicket.palette.Utilities;
+import org.netbeans.spi.palette.PaletteItemRegistration;
 import org.openide.filesystems.FileObject;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.Exceptions;
@@ -20,6 +21,17 @@ import org.openide.util.Exceptions;
  *
  * @author Tim Boudreau
  */
+@PaletteItemRegistration(
+        paletteid = "HTMLPalette",
+        category = "Wicket",
+        itemid = "Editable",
+//        name = "#NAME_wicket-editable",
+        name = "AJAX Editable Label",
+        icon16 = "org/netbeans/modules/web/wicket/palette/editablefield/editable_16.png",
+        icon32 = "org/netbeans/modules/web/wicket/palette/editablefield/editable_32.png",
+//        tooltip = "#HINT_wicket-editable"
+        tooltip = "<html>editable</html>"
+)
 public class Editable implements ActiveEditorDrop {
 
     private String wicketId = "";
@@ -39,7 +51,7 @@ public class Editable implements ActiveEditorDrop {
                 String body = this.createBody();
                 FileObject javaFo = JavaForMarkupQuery.find(Utilities.getFileObject(targetComponent));
                 final JavaSource source = JavaSource.forFileObject((FileObject)javaFo);
-                source.runUserActionTask((Task)new Task<CompilationController>() {
+                source.runUserActionTask(new Task<CompilationController>() {
 
                     @Override
                     public void run(CompilationController compilationController) throws Exception {

@@ -13,6 +13,7 @@ import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.Task;
 import org.netbeans.api.wicket.JavaForMarkupQuery;
 import org.netbeans.modules.web.wicket.palette.Utilities;
+import org.netbeans.spi.palette.PaletteItemRegistration;
 import org.openide.filesystems.FileObject;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.Exceptions;
@@ -21,6 +22,19 @@ import org.openide.util.Exceptions;
  *
  * @author Tim Boudreau
  */
+@PaletteItemRegistration(
+        paletteid = "HTMLPalette",
+        category = "Wicket",
+        itemid = "Label",
+        //        name = "#NAME_wicket-label",
+        name = "Label",
+        icon16 = "org/netbeans/modules/web/wicket/palette/label/label_16.png",
+        icon32 = "org/netbeans/modules/web/wicket/palette/label/label_32.png",
+        //        tooltip = "#HINT_wicket-label"
+        tooltip = "<html>\n"
+        + "&lt;span wicket:id=\"<i>value_1</i>\"&gt;<i>value_2</i>&lt;/span&gt;\n"
+        + "</html>"
+)
 public class Label implements ActiveEditorDrop {
 
     private String wicketId = "";
