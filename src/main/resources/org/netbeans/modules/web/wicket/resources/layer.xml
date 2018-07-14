@@ -1,41 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
 <filesystem>
-    <folder name="HTMLPalette">
-        <folder name="Wicket">
-            <file name="Label.xml" url="nbresloc:/org/netbeans/modules/web/wicket/palette/label/Label.xml">
-                <attr name="position" intvalue="100"/>
-            </file>
-            <file name="AjaxField.xml" url="nbresloc:/org/netbeans/modules/web/wicket/palette/ajaxfield/AjaxField.xml">
-                <attr name="position" intvalue="300"/>
-            </file>
-            <file name="DropDown.xml" url="nbresloc:/org/netbeans/modules/web/wicket/palette/dropdown/DropDown.xml">
-                <attr name="position" intvalue="200"/>
-            </file>
-            <file name="Editable.xml" url="nbresloc:/org/netbeans/modules/web/wicket/palette/editablefield/Editable.xml">
-                <attr name="position" intvalue="400"/>
-            </file>
-        </folder>
-        <attr name="HTML/JSF" boolvalue="true"/>
-        <attr name="HTML_Forms/JSF" boolvalue="true"/>
-    </folder>
-
     <folder name="Editors">
         <folder name="AnnotationTypes">
+            <!-- Activate WicketProblemMarks in the editor -->
             <file name="org-netbeans-modules-web-wicket-verification-WicketProblemMark.xml" url="/org/netbeans/modules/web/wicket/verification/WicketProblemMark.xml"/>
         </folder>
         <folder name="text">
             <folder name="html">
                 <folder name="Popup">
                     <folder name="goto">
+                        <!-- Activate "Goto Java" in the HTML editor's popup -->
                         <file name="org-netbeans-modules-web-wicket-actions-GotoJavaAction.shadow">
                             <attr name="originalFile" stringvalue="Actions/Wicket/org-netbeans-modules-web-wicket-actions-GotoJavaAction.instance"/>
                         </file>
                     </folder>
                 </folder>
                 <folder name="HyperlinkProviders">
+                    <!-- Activate Hyperlinks from HTML to Java source -->
                     <file name="WicketHTMLHyperlinkProvider.instance">
-                        <attr name="instanceClass" stringvalue="org.netbeans.modules.web.wicket.hyperlink.WicketHTMLHyperlingProvider"/>
+                        <attr name="instanceClass" stringvalue="org.netbeans.modules.web.wicket.hyperlink.WicketHTMLHyperlinkProvider"/>
                         <attr name="instanceOf" stringvalue="org.netbeans.lib.editor.hyperlink.spi.HyperlinkProvider"/>
                     </file>
                 </folder>
@@ -43,17 +27,18 @@
             <folder name="x-java">
                 <folder name="Popup">
                     <folder name="goto">
+                        <!-- Activate "Goto HTML" in the Java editor's popup -->
                         <file name="org-netbeans-modules-web-wicket-actions-GotoHTMLAction.shadow">
                             <attr name="originalFile" stringvalue="Actions/Wicket/org-netbeans-modules-web-wicket-actions-GotoHTMLAction.instance"/>
                             <attr name="position" intvalue="101"/>
                         </file>
                     </folder>
-                    <attr name="goto-help/org-netbeans-modules-web-wicket-tree-SomeAction.shadow" boolvalue="true"/>
+                    <attr name="goto-help/org-netbeans-modules-web-wicket-tree-util-TestWicketParsingAction.shadow" boolvalue="true"/>
                     <attr name="goto-help/org-netbeans-modules-web-wicket-tree-separatorBefore.instance" boolvalue="true"/>
-                    <attr name="org-netbeans-modules-web-wicket-tree-SomeAction.shadow/SeparatorAfterGoToHelp.instance" boolvalue="true"/>
-                    <attr name="org-netbeans-modules-web-wicket-tree-SomeAction.shadow/org-netbeans-modules-web-wicket-tree-separatorAfter.instance" boolvalue="true"/>
+                    <attr name="org-netbeans-modules-web-wicket-tree-util-TestWicketParsingAction.shadow/SeparatorAfterGoToHelp.instance" boolvalue="true"/>
+                    <attr name="org-netbeans-modules-web-wicket-tree-util-TestWicketParsingAction.shadow/org-netbeans-modules-web-wicket-tree-separatorAfter.instance" boolvalue="true"/>
                     <attr name="org-netbeans-modules-web-wicket-tree-separatorAfter.instance/SeparatorAfterGoToHelp.instance" boolvalue="true"/>
-                    <attr name="org-netbeans-modules-web-wicket-tree-separatorBefore.instance/org-netbeans-modules-web-wicket-tree-SomeAction.shadow" boolvalue="true"/>
+                    <attr name="org-netbeans-modules-web-wicket-tree-separatorBefore.instance/org-netbeans-modules-web-wicket-tree-util-TestWicketParsingAction.shadow" boolvalue="true"/>
                     <file name="org-netbeans-modules-web-wicket-tree-separatorAfter.instance">
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                     </file>
@@ -70,25 +55,18 @@
                 </folder>
             </folder>
         </folder>
-        <!--        <folder name="Hints">
-            <file name="org-netbeans-modules-web-wicket-verification-WicketHintsProvider.instance">
-                <attr name="instanceClass" stringvalue="org.netbeans.modules.web.wicket.verification.WicketHintsProvider"/>
-                <attr name="instanceOf" stringvalue="org.netbeans.modules.editor.hints.spi.HintsProvider"/>
-                <attr name="instanceCreate" methodvalue="org.netbeans.modules.web.wicket.verification.WicketHintsProvider.getInstance"/>
-            </file>
-        </folder>-->
     </folder>
 
     <folder name="Loaders">
         <folder name="text">
             <folder name="x-java">
                 <folder name="Actions">
-                    <attr name="PasteAction.instance/org-netbeans-modules-web-wicket-tree-SomeAction.shadow" boolvalue="true"/>
+                    <attr name="PasteAction.instance/org-netbeans-modules-web-wicket-tree-util-TestWicketParsingAction.shadow" boolvalue="true"/>
                     <attr name="PasteAction.instance/org-netbeans-modules-web-wicket-tree-separatorBefore.instance" boolvalue="true"/>
-                    <attr name="org-netbeans-modules-web-wicket-tree-SomeAction.shadow/CompileFile.instance" boolvalue="true"/>
-                    <attr name="org-netbeans-modules-web-wicket-tree-SomeAction.shadow/org-netbeans-modules-web-wicket-tree-separatorAfter.instance" boolvalue="true"/>
+                    <attr name="org-netbeans-modules-web-wicket-tree-util-TestWicketParsingAction.shadow/CompileFile.instance" boolvalue="true"/>
+                    <attr name="org-netbeans-modules-web-wicket-tree-util-TestWicketParsingAction.shadow/org-netbeans-modules-web-wicket-tree-separatorAfter.instance" boolvalue="true"/>
                     <attr name="org-netbeans-modules-web-wicket-tree-separatorAfter.instance/CompileFile.instance" boolvalue="true"/>
-                    <attr name="org-netbeans-modules-web-wicket-tree-separatorBefore.instance/org-netbeans-modules-web-wicket-tree-SomeAction.shadow" boolvalue="true"/>
+                    <attr name="org-netbeans-modules-web-wicket-tree-separatorBefore.instance/org-netbeans-modules-web-wicket-tree-util-TestWicketParsingAction.shadow" boolvalue="true"/>
                     <file name="org-netbeans-modules-web-wicket-tree-separatorAfter.instance">
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                     </file>
