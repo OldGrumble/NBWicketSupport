@@ -11,7 +11,7 @@ import org.netbeans.api.java.source.CompilationInfo;
 import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.Task;
 import org.netbeans.api.wicket.JavaForMarkupQuery;
-import org.netbeans.modules.web.wicket.palette.Utilities;
+import org.netbeans.modules.web.wicket.palette.util.PaletteSupportUtilities;
 import org.netbeans.spi.palette.PaletteItemRegistration;
 import org.openide.filesystems.FileObject;
 import org.openide.text.ActiveEditorDrop;
@@ -49,7 +49,7 @@ public class Editable implements ActiveEditorDrop {
         if (accept) {
             try {
                 String body = this.createBody();
-                FileObject javaFo = JavaForMarkupQuery.find(Utilities.getFileObject(targetComponent));
+                FileObject javaFo = JavaForMarkupQuery.find(PaletteSupportUtilities.getFileObject(targetComponent));
                 final JavaSource source = JavaSource.forFileObject((FileObject)javaFo);
                 source.runUserActionTask(new Task<CompilationController>() {
 
@@ -72,10 +72,10 @@ public class Editable implements ActiveEditorDrop {
                     @Override
                     public void run(CompilationController compilationController) throws Exception {
                         compilationController.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED);
-                        Utilities.addMethodToClass(source, Utilities.getGetter(Editable.this.getWicketId()), "String", "return " + Editable.this.getWicketId());
+                        PaletteSupportUtilities.addMethodToClass(source, PaletteSupportUtilities.getGetter(Editable.this.getWicketId()), "String", "return " + Editable.this.getWicketId());
                     }
                 }, true);
-                Utilities.insert(body, targetComponent);
+                PaletteSupportUtilities.insertHTML(targetComponent, body);
             } catch (BadLocationException | IOException ex) {
                 Exceptions.printStackTrace((Throwable)ex);
                 accept = false;
