@@ -41,7 +41,7 @@ import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 
 /**
- * 
+ *
  * @author Tim Boudreau
  */
 @NavigatorPanel.Registration(
@@ -148,8 +148,7 @@ public class WicketJavaTagNavigator implements NavigatorPanel, LookupListener {
         return this.currentCallback;
     }
 
-    private class CB
-            implements TreeCallback {
+    private class CB implements TreeCallback {
 
         volatile boolean cancelled = false;
         final FileObject fob;
@@ -166,24 +165,16 @@ public class WicketJavaTagNavigator implements NavigatorPanel, LookupListener {
         @Override
         public void setTree(final MarkupContainerTree<String> tagTree) {
             try {
-                if (tagTree == null) {
-                    return;
-                }
-                if (this.cancelled || tagTree == null) {
-                    return;
-                }
-                Mutex.EVENT.readAccess(new Runnable() {
-
-                    @Override
-                    public void run() {
+                if (!cancelled && tagTree != null) {
+                    Mutex.EVENT.readAccess(() -> {
+                        // Runnable
                         TreeModel mdl = tagTree.toTreeModel();
-                        CB.this.pnl.setModel(mdl, CB.this.fob);
-                    }
-                });
+                        pnl.setModel(mdl, fob);
+                    });
+                }
             } finally {
-                this.cancelled = true;
-                WicketJavaTagNavigator wicketJavaTagNavigator = WicketJavaTagNavigator.this;
-                synchronized (wicketJavaTagNavigator) {
+                cancelled = true;
+                synchronized (WicketJavaTagNavigator.this) {
                     if (WicketJavaTagNavigator.this.currentCallback == this) {
                         WicketJavaTagNavigator.this.currentCallback = null;
                     }
@@ -193,9 +184,7 @@ public class WicketJavaTagNavigator implements NavigatorPanel, LookupListener {
 
     }
 
-    private static final class Pnl
-            extends JPanel
-            implements TreeSelectionListener {
+    private static final class Pnl extends JPanel implements TreeSelectionListener {
 
         private final JTree jt = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode()));
         private FileObject file;
@@ -239,28 +228,27 @@ public class WicketJavaTagNavigator implements NavigatorPanel, LookupListener {
         }
 
         private void selected(Node nd) {
-            if (this.file == null || !this.file.isValid()) {
-                return;
-            }
-            try {
-                DataObject ob = DataObject.find((FileObject)this.file);
-                EditorCookie ec = (EditorCookie)ob.getLookup().lookup(EditorCookie.class);
-                if (ec != null) {
-                    JEditorPane[] t = ec.getOpenedPanes();
-                    if (t == null) {
-                        System.err.println("Got null opened panes for " + this.file.getPath());
-                        return;
+            if (file != null && file.isValid()) {
+                try {
+                    DataObject ob = DataObject.find(file);
+                    EditorCookie ec = ob.getLookup().lookup(EditorCookie.class);
+                    if (ec != null) {
+                        JEditorPane[] t = ec.getOpenedPanes();
+                        if (t == null) {
+                            System.err.println("Got null opened panes for " + file.getPath());
+                            return;
+                        }
+                        JEditorPane editor = ec.getOpenedPanes()[0];
+                        editor.setCaretPosition(nd.getOffset());
+                        TopComponent tc = (TopComponent)SwingUtilities.getAncestorOfClass(TopComponent.class, editor);
+                        if (tc != null) {
+                            tc.requestActive();
+                        }
+                        editor.requestFocus();
                     }
-                    JEditorPane editor = ec.getOpenedPanes()[0];
-                    editor.setCaretPosition(nd.getOffset());
-                    TopComponent tc = (TopComponent)SwingUtilities.getAncestorOfClass(TopComponent.class, editor);
-                    if (tc != null) {
-                        tc.requestActive();
-                    }
-                    editor.requestFocus();
+                } catch (DataObjectNotFoundException ex) {
+                    Exceptions.printStackTrace(ex);
                 }
-            } catch (DataObjectNotFoundException ex) {
-                Exceptions.printStackTrace(ex);
             }
         }
 
@@ -269,8 +257,8 @@ public class WicketJavaTagNavigator implements NavigatorPanel, LookupListener {
             super.addNotify();
             TopComponent tc = (TopComponent)SwingUtilities.getAncestorOfClass(TopComponent.class, this);
             if (tc != null) {
-                this.prev = (Boolean)tc.getClientProperty((Object)"dontActivate");
-                tc.putClientProperty((Object)"dontActivate", (Object)Boolean.TRUE);
+                this.prev = (Boolean)tc.getClientProperty("dontActivate");
+                tc.putClientProperty("dontActivate", Boolean.TRUE);
             }
         }
 
@@ -278,7 +266,7 @@ public class WicketJavaTagNavigator implements NavigatorPanel, LookupListener {
         public void removeNotify() {
             TopComponent tc = (TopComponent)SwingUtilities.getAncestorOfClass(TopComponent.class, this);
             if (tc != null) {
-                tc.putClientProperty((Object)"dontActivate", (Object)this.prev);
+                tc.putClientProperty("dontActivate", this.prev);
             }
             super.removeNotify();
         }

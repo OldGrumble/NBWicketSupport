@@ -41,14 +41,14 @@ import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 
 /**
- * 
+ *
  * @author Tim Boudreau
  */
 @NavigatorPanel.Registration(
         mimeType = WicketSupportConstants.MIME_TYPE_HTML,
         displayName = "#LBL_NAME"
 )
-public class WicketTagNavigator implements NavigatorPanel, LookupListener {
+public class WicketHtmlTagNavigator implements NavigatorPanel, LookupListener {
 
     private Lookup ctx = Lookup.EMPTY;
     Lookup.Result<DataObject> res;
@@ -56,12 +56,12 @@ public class WicketTagNavigator implements NavigatorPanel, LookupListener {
 
     @Override
     public String getDisplayName() {
-        return NbBundle.getMessage(WicketTagNavigator.class, "LBL_NAME");
+        return NbBundle.getMessage(WicketHtmlTagNavigator.class, "LBL_NAME");
     }
 
     @Override
     public String getDisplayHint() {
-        return NbBundle.getMessage(WicketTagNavigator.class, "LBL_HINT");
+        return NbBundle.getMessage(WicketHtmlTagNavigator.class, "LBL_HINT");
     }
 
     @Override
@@ -150,9 +150,7 @@ public class WicketTagNavigator implements NavigatorPanel, LookupListener {
         }
     }
 
-    private static final class Pnl
-            extends JPanel
-            implements TreeSelectionListener {
+    private static final class Pnl extends JPanel implements TreeSelectionListener {
 
         private final JTree jt = new JTree(new DefaultTreeModel(new DefaultMutableTreeNode()));
         private FileObject file;
@@ -235,10 +233,9 @@ public class WicketTagNavigator implements NavigatorPanel, LookupListener {
         public void removeNotify() {
             TopComponent tc = (TopComponent)SwingUtilities.getAncestorOfClass(TopComponent.class, this);
             if (tc != null) {
-                tc.putClientProperty((Object)"dontActivate", (Object)this.prev);
+                tc.putClientProperty("dontActivate", this.prev);
             }
             super.removeNotify();
         }
     }
-
 }
