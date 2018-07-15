@@ -4,6 +4,7 @@
 package org.netbeans.modules.web.wicket.palette.util;
 
 import java.io.IOException;
+import java.util.Set;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
@@ -46,7 +47,17 @@ public class PaletteSupportUtilities {
         return "get" + firstLetterUpped + restofWord;
     }
 
-    public static void addMethodToClass(JavaSource source, final String methodName, final String methodReturnType, final String body) {
+    public static void addMethodToClass(JavaSource source, final NewMethodProperties props) {
+        Task<WorkingCopy> task = new AddMethodToClassWorkerTask(props);
+        try {
+            ModificationResult result = source.runModificationTask(task);
+            result.commit();
+        } catch (IOException ex) {
+            Exceptions.printStackTrace((Throwable)ex);
+        }
+    }
+
+    public static void addMethodToClass(JavaSource source, final String methodName, final String methodReturnType, final String body, final Set<String> requiredImports) {
         Task<WorkingCopy> task = new AddMethodToClassWorkerTask(methodName, methodReturnType, body);
         try {
             ModificationResult result = source.runModificationTask(task);

@@ -25,11 +25,11 @@ import org.openide.util.Exceptions;
         paletteid = "HTMLPalette",
         category = "Wicket",
         itemid = "Editable",
-//        name = "#NAME_wicket-editable",
+        //        name = "#NAME_wicket-editable",
         name = "AJAX Editable Label",
         icon16 = "org/netbeans/modules/web/wicket/palette/editablefield/editable_16.png",
         icon32 = "org/netbeans/modules/web/wicket/palette/editablefield/editable_32.png",
-//        tooltip = "#HINT_wicket-editable"
+        //        tooltip = "#HINT_wicket-editable"
         tooltip = "<html>editable</html>"
 )
 public class Editable implements ActiveEditorDrop {
@@ -72,7 +72,7 @@ public class Editable implements ActiveEditorDrop {
                     @Override
                     public void run(CompilationController compilationController) throws Exception {
                         compilationController.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED);
-                        PaletteSupportUtilities.addMethodToClass(source, PaletteSupportUtilities.getGetter(Editable.this.getWicketId()), "String", "return " + Editable.this.getWicketId());
+                        PaletteSupportUtilities.addMethodToClass(source, PaletteSupportUtilities.getGetter(Editable.this.getWicketId()), "String", "return " + Editable.this.getWicketId(), null);
                     }
                 }, true);
                 PaletteSupportUtilities.insertHTML(targetComponent, body);

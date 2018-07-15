@@ -73,11 +73,12 @@ public class AddVariableToConstructor extends TreePathScanner<Void, Void> {
             for (Element enclosedElement : enclosedElements) {
                 if (enclosedElement.getKind() == ElementKind.CONSTRUCTOR) {
                     ExecutableElement exe = (ExecutableElement)enclosedElement;
+
                     final MethodTree constructor = info.getTrees().getTree(exe);
 
                     Task<WorkingCopy> task1 = new WorkerTask(constructor);
                     try {
-                        ModificationResult result = source.runModificationTask((Task)task1);
+                        ModificationResult result = source.runModificationTask(task1);
                         result.commit();
                     } catch (IOException ex) {
                         Exceptions.printStackTrace((Throwable)ex);
