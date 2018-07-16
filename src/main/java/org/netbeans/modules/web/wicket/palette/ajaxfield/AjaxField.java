@@ -5,11 +5,15 @@ package org.netbeans.modules.web.wicket.palette.ajaxfield;
 
 import com.sun.source.util.TreePathScanner;
 import java.io.IOException;
+import java.util.Set;
+import java.util.TreeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.java.source.*;
 import org.netbeans.api.wicket.JavaForMarkupQuery;
-import org.netbeans.modules.web.wicket.palette.Utilities;
+import org.netbeans.modules.web.wicket.palette.util.AddInvocationToConstructor;
+import org.netbeans.modules.web.wicket.palette.util.NewMethodProperties;
+import org.netbeans.modules.web.wicket.palette.util.PaletteSupportUtilities;
 import org.netbeans.spi.palette.PaletteItemRegistration;
 import org.openide.filesystems.FileObject;
 import org.openide.text.ActiveEditorDrop;
@@ -71,7 +75,7 @@ public class AjaxField implements ActiveEditorDrop {
                 throws Exception {
             compilationController.toPhase(org.netbeans.api.java.source.JavaSource.Phase.ELEMENTS_RESOLVED);
 
-            TreePathScanner<Void, Void> scanner = new Utilities.AddInvocationToConstructor(
+            TreePathScanner<Void, Void> scanner = new AddInvocationToConstructor(
                     source,
                     compilationController,
                     "getAutoCompleteTextField()"
@@ -87,21 +91,22 @@ public class AjaxField implements ActiveEditorDrop {
     @Override
     public boolean handleTransfer(JTextComponent targetComponent) {
         String body = "\n<input type=\"text\" wicket:id=\"countries\" size=\"50\"/>\n";
-        FileObject javaFo = JavaForMarkupQuery.find(Utilities.getFileObject(targetComponent));
+        FileObject javaFo = JavaForMarkupQuery.find(PaletteSupportUtilities.getFileObject(targetComponent));
         final JavaSource source = JavaSource.forFileObject(javaFo);
+        final Set<String> imports = new TreeSet<>();
+        imports.add("AutoCompleteTextField");
+        NewMethodProperties props = new NewMethodProperties("getAutoCompleteTextField", "org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField");
+        props.setBodyContent(JAVA);
+        props.setRequiredImports(imports);
         if (source != null) {
-            Utilities.addMethodToClass(source, "getAutoCompleteTextField", "AutoCompleteTextField", JAVA);
+            PaletteSupportUtilities.addMethodToClass(source, props);
             try {
                 source.runUserActionTask(new TaskImpl(source), true);
-            } catch (IOException ex) {
+                PaletteSupportUtilities.insertHTML(targetComponent, body);
+                return true;
+            } catch (IOException | BadLocationException ex) {
                 Exceptions.printStackTrace(ex);
             }
-            try {
-                Utilities.insert(body, targetComponent);
-            } catch (BadLocationException ble) {
-                return false;
-            }
-            return true;
         }
         return false;
     }
