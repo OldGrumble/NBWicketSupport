@@ -30,13 +30,16 @@ import org.openide.util.actions.CookieAction;
  *
  * @author Tim Boudreau
  */
-@ActionID(id = "org.netbeans.modules.web.wicket.tree.SomeAction", category = "BpelNodes")
-@ActionRegistration(displayName = "SomeAction", lazy = false)
+@ActionID(id = "org.netbeans.modules.web.wicket.tree.util.TestWicketParsingAction", category = "BpelNodes")
+@ActionRegistration(displayName = "#CTL_TestWicketParsingAction", lazy = false)
 @ActionReferences(value = {
-    @ActionReference(path = "Editors/" + WicketSupportConstants.MIME_TYPE_JAVA + "/Popup"),
+    @ActionReference(path = "Editors/" + WicketSupportConstants.MIME_TYPE_JAVA + "/Popup")
+    ,
     @ActionReference(path = "Loaders/" + WicketSupportConstants.MIME_TYPE_JAVA + "/Actions")
 })
 public final class TestWicketParsingAction extends CookieAction {
+
+    private static final long serialVersionUID = 1L;
 
     @Override
     protected void performAction(Node[] activatedNodes) {
@@ -53,7 +56,7 @@ public final class TestWicketParsingAction extends CookieAction {
 
     @Override
     public String getName() {
-        return NbBundle.getMessage(TestWicketParsingAction.class, (String)"CTL_SomeAction");
+        return NbBundle.getMessage(TestWicketParsingAction.class, "CTL_TestWicketParsingAction");
     }
 
     @Override
@@ -104,10 +107,8 @@ public final class TestWicketParsingAction extends CookieAction {
                 if (ck != null) {
                     StyledDocument doc = ck.openDocument();
                     System.err.println("Got document " + doc);
-                    if (htmlFile != null) {
-                        HtmlTreeBuilder builder = new HtmlTreeBuilder(doc);
-                        this.htmlTree = builder.getTree();
-                    }
+                    HtmlTreeBuilder builder = new HtmlTreeBuilder(doc);
+                    this.htmlTree = builder.getTree();
                 } else {
                     System.err.println("Editor cookie null");
                 }

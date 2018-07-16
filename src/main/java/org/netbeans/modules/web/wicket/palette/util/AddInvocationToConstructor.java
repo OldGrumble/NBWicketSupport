@@ -72,13 +72,15 @@ public class AddInvocationToConstructor extends TreePathScanner<Void, Void> {
                 if (enclosedElement.getKind() == ElementKind.CONSTRUCTOR) {
                     ExecutableElement exe = (ExecutableElement)enclosedElement;
                     final MethodTree constructor = info.getTrees().getTree(exe);
+
                     Task<WorkingCopy> task1 = new WorkerTask(constructor, code);
                     try {
-                        ModificationResult result = this.source.runModificationTask((Task)task1);
+                        ModificationResult result = this.source.runModificationTask(task1);
                         result.commit();
                     } catch (IOException ex) {
                         Exceptions.printStackTrace((Throwable)ex);
                     }
+
                 }
             }
         }

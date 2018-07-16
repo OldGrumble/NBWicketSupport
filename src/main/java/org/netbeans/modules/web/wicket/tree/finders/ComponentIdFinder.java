@@ -24,7 +24,7 @@ import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.java.source.CompilationController;
 
 /**
- * 
+ *
  * @author Tim Boudreau
  */
 public class ComponentIdFinder extends TreeScanner<Void, List<String>> {
@@ -37,20 +37,13 @@ public class ComponentIdFinder extends TreeScanner<Void, List<String>> {
         this.cc = cc;
     }
 
-    private void scanInArgs(List<? extends ExpressionTree> args, List<String> s) {
-        for (ExpressionTree t : args) {
-            TypeMirror argType = cc.getTrees().getTypeMirror(TreePath.getPath(cc.getCompilationUnit(), (Tree)t));
-            if (argType != null && "java.lang.String".equals(argType.toString())) {
-                inArg = true;
-                try {
-                    t.accept(this, s);
-                } finally {
-                    inArg = false;
-                }
-            }
-        }
-    }
-
+    /**
+     * Accept
+     *
+     * @param tree
+     * @param s
+     * @return
+     */
     @Override
     public Void visitNewClass(NewClassTree tree, List<String> s) {
         List<? extends ExpressionTree> args = tree.getArguments();
@@ -61,17 +54,21 @@ public class ComponentIdFinder extends TreeScanner<Void, List<String>> {
             if (el != null) {
                 System.err.println("Super element is " + el.getQualifiedName());
                 ClassTree cTree = cc.getTrees().getTree(el);
-                Set constructors = new HashSet();
+                Set<MethodTree> constructors = new HashSet();
                 cTree.accept(new ConstructorFinder(), constructors);
+
                 this.searchingConstructor = true;
                 try {
                     MethodTree constructor;
-                    for (Iterator iterator = constructors.iterator(); iterator.hasNext(); constructor.accept(this, s)) {
-                        constructor = (MethodTree)iterator.next();
+                    Iterator<MethodTree> iterator = constructors.iterator();
+                    while (iterator.hasNext()) {
+                        constructor = iterator.next();
+                        constructor.accept(this, s);
                     }
                 } finally {
                     this.searchingConstructor = false;
                 }
+
             } else {
                 System.err.println("Super element is null");
             }
@@ -118,5 +115,19 @@ public class ComponentIdFinder extends TreeScanner<Void, List<String>> {
             s.add(tree.toString());
         }
         return (Void)super.visitLiteral(tree, s);
+    }
+
+    private void scanInArgs(List<? extends ExpressionTree> args, List<String> s) {
+        for (ExpressionTree expTree : args) {
+            TypeMirror argType = cc.getTrees().getTypeMirror(TreePath.getPath(cc.getCompilationUnit(), (Tree)expTree));
+            if (argType != null && "java.lang.String".equals(argType.toString())) {
+                inArg = true;
+                try {
+                    expTree.accept(this, s);
+                } finally {
+                    inArg = false;
+                }
+            }
+        }
     }
 }

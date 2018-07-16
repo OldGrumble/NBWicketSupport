@@ -71,8 +71,7 @@ public class AjaxField implements ActiveEditorDrop {
         }
 
         @Override
-        public void run(CompilationController compilationController)
-                throws Exception {
+        public void run(CompilationController compilationController) throws Exception {
             compilationController.toPhase(org.netbeans.api.java.source.JavaSource.Phase.ELEMENTS_RESOLVED);
 
             TreePathScanner<Void, Void> scanner = new AddInvocationToConstructor(
