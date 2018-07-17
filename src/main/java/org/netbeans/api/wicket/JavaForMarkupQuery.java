@@ -16,16 +16,13 @@ import org.openide.util.Lookup;
 public final class JavaForMarkupQuery {
 
     public static FileObject find(FileObject htmlFile) {
-        Collection c = Lookup.getDefault().lookupAll(JavaForMarkupQueryImplementation.class);
+        Collection<? extends JavaForMarkupQueryImplementation> c = Lookup.getDefault().lookupAll(JavaForMarkupQueryImplementation.class);
         FileObject result = null;
-        Iterator iterator = c.iterator();
-        do {
-            if (!iterator.hasNext()) {
-                break;
-            }
-            JavaForMarkupQueryImplementation impl = (JavaForMarkupQueryImplementation)iterator.next();
+        Iterator<? extends JavaForMarkupQueryImplementation> iterator = c.iterator();
+        while (result == null && iterator.hasNext()) {
+            JavaForMarkupQueryImplementation impl = iterator.next();
             result = impl.find(htmlFile);
-        } while (result == null);
+        }
         return result;
     }
 
