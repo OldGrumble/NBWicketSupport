@@ -47,68 +47,67 @@ public final class AddToMarkupContainerFinder extends TreeScanner<Void, List<Inv
     }
 
     @Override
-    public Void visitMethodInvocation(MethodInvocationTree t, List<Invocation> invocations) {
-        boolean isMarkupContainer;
-        Tree tree;
+    public Void visitMethodInvocation(MethodInvocationTree invocationTree, List<Invocation> invocations) {
         assert (invocations != null);
-        TypeElement markupContainerType = this.cc.getElements().getTypeElement("org.apache.wicket.MarkupContainer");
+        boolean isMarkupContainer;
+        // Get all sub-classes of org.apache.wicket.MarkupContainer
+        TypeElement markupContainerType = cc.getElements().getTypeElement("org.apache.wicket.MarkupContainer");
         TypeMirror mctType = markupContainerType.asType();
-        TypeElement repeaterType = this.cc.getElements().getTypeElement("org.apache.wicket.markup.repeater.RefreshingView");
+        // Get all sub-classes of org.apache.wicket.markup.repeater.RefreshingView (unused)
+        TypeElement repeaterType = cc.getElements().getTypeElement("org.apache.wicket.markup.repeater.RefreshingView");
         TypeMirror repType = repeaterType.asType();
-        TypeElement itemType = this.cc.getElements().getTypeElement("org.apache.wicket.markup.repeater.Item");
+        // Get all sub-classes of org.apache.wicket.markup.repeater.Item
+        TypeElement itemType = cc.getElements().getTypeElement("org.apache.wicket.markup.repeater.Item");
         TypeMirror itType = itemType.asType();
-        TreePath path = TreePath.getPath(this.cc.getCompilationUnit(), (Tree)t);
-        if (path == null) {
-            return null;
-        }
-        do {
+        // Get path to enclosing class
+        TreePath path = TreePath.getPath(cc.getCompilationUnit(), invocationTree);
+        while (path != null) {
             path = path.getParentPath();
-            if (path == null) {
+            if (path == null || path.getLeaf().getKind() == Tree.Kind.CLASS) {
                 break;
             }
-            path.getLeaf().getKind();
-        } while (path.getLeaf().getKind() != Tree.Kind.CLASS);
+        }
         if (path == null) {
             return null;
         }
-        TypeElement currentClassType = (TypeElement)this.cc.getTrees().getElement(path);
+        // Get the class type referenced by the path
+        TypeElement currentClassType = (TypeElement)cc.getTrees().getElement(path);
+        // BEGIN of what?
         Element target = currentClassType;
-        Element elemForMethodInvocation;
-        elemForMethodInvocation = this.cc.getTrees().getElement(TreePath.getPath(this.cc.getCompilationUnit(), (Tree)t));
-        TypeMirror typeCallOccursOn = null;
-        TypeElement enclosing = this.cc.getElementUtilities().enclosingTypeElement(elemForMethodInvocation);
-        Object object = enclosing == null ? (target == null ? null : target.asType()) : (typeCallOccursOn = enclosing.asType());
         if (target == null) {
-            System.err.println("Give up on " + t);
+            System.err.println("Give up on " + invocationTree);
             return null;
         }
-        String call; // = t.getMethodSelect().toString();
-        ExpressionTree mst = t.getMethodSelect();
+        Element elemForMethodInvocation = cc.getTrees().getElement(TreePath.getPath(cc.getCompilationUnit(), invocationTree));
+        TypeElement enclosing = cc.getElementUtilities().enclosingTypeElement(elemForMethodInvocation);
+        TypeMirror typeCallOccursOn = (enclosing != null) ? enclosing.asType() : target.asType();
+
+        String call; //  = invocationTree.getMethodSelect().toString();  // assigned value never used
+        ExpressionTree mst = invocationTree.getMethodSelect();
         ExpressionTree thingAddIsCalledOn = null;
         boolean isAddToRepeaterItem = false;
         switch (mst.getKind()) {
             case MEMBER_SELECT: {
                 MemberSelectTree m = (MemberSelectTree)mst;
-                String id = m.getIdentifier().toString();
-                call = id;
+                call = m.getIdentifier().toString();
                 thingAddIsCalledOn = m.getExpression();
                 if (thingAddIsCalledOn != null) {
-                    target = this.cc.getTrees().getElement(TreePath.getPath(this.cc.getCompilationUnit(), (Tree)thingAddIsCalledOn));
+                    target = cc.getTrees().getElement(TreePath.getPath(cc.getCompilationUnit(), thingAddIsCalledOn));
                     if (target == null) {
-                        System.err.println("Give up on " + t);
+                        System.err.println("Give up on " + invocationTree);
                         return null;
                     }
                     isAddToRepeaterItem = itType.equals(target.asType());
                     if (!isAddToRepeaterItem) {
                         break;
                     }
-                    TreePath pathToParent = TreePath.getPath(this.cc.getCompilationUnit(), (Tree)m);
+                    TreePath pathToParent = TreePath.getPath(cc.getCompilationUnit(), m);
                     while ((pathToParent = pathToParent.getParentPath()) != null && pathToParent.getLeaf().getKind() != Tree.Kind.CLASS) {
                     }
                     if (pathToParent == null) {
                         break;
                     }
-                    Element nuTarget = this.cc.getTrees().getElement(pathToParent);
+                    Element nuTarget = cc.getTrees().getElement(pathToParent);
                     System.err.println("Add To Repeater parent proxied to " + nuTarget);
                     if (nuTarget == null) {
                         break;
@@ -126,16 +125,17 @@ public final class AddToMarkupContainerFinder extends TreeScanner<Void, List<Inv
                 break;
             }
             default: {
-                System.err.println("mst not a MemberSelectTree, it is " + (Object)((Object)mst.getKind()) + " " + mst.getClass().getName() + ": " + Arrays.asList(mst.getClass().getInterfaces()) + " : " + mst);
+                System.err.println("mst not a MemberSelectTree, it is " + mst.getKind() + " " + mst.getClass().getName() + ": " + Arrays.asList(mst.getClass().getInterfaces()) + " : " + mst);
                 return null;
             }
         }
-        System.err.println("isAddToRepeaterItem " + isAddToRepeaterItem + " for " + t);
-        if (thingAddIsCalledOn == null && path.getLeaf() instanceof ExpressionTree) {
+        System.err.println("isAddToRepeaterItem " + isAddToRepeaterItem + " for " + invocationTree);
+        if (thingAddIsCalledOn == null && (path.getLeaf() instanceof ExpressionTree)) {
             thingAddIsCalledOn = (ExpressionTree)path.getLeaf();
         } else if (isAddToRepeaterItem) {
             // empty if block
         }
+
         if (target == null) {
             System.err.println("Reverting current class type");
             target = currentClassType;
@@ -147,7 +147,7 @@ public final class AddToMarkupContainerFinder extends TreeScanner<Void, List<Inv
                 isMarkupContainer = false;
             } else {
                 typeOfTarget = target.asType();
-                isMarkupContainer = this.cc.getTypeUtilities().isCastable(typeOfTarget, mctType);
+                isMarkupContainer = cc.getTypeUtilities().isCastable(typeOfTarget, mctType);
             }
         } catch (IllegalArgumentException a) {
             System.err.println("isCastable throws assertion error on " + target.asType() + " and " + mctType);
@@ -157,69 +157,107 @@ public final class AddToMarkupContainerFinder extends TreeScanner<Void, List<Inv
         if (!isMarkupContainer || !isAdd) {
             return null;
         }
-        List<? extends ExpressionTree> l = t.getArguments();
+        List<? extends ExpressionTree> l = invocationTree.getArguments();
         if (l.size() <= 2) {
-            for (ExpressionTree arg : l) {
-                NewClassTree constructionOfAddedComponent;
-                if (!Utils.isWebMarkupContainer(this.cc.getTrees(), this.cc.getTypes(), this.cc.getCompilationUnit(), arg)) {
-                    continue;
-                }
-                Element argument = this.cc.getTrees().getElement(TreePath.getPath(this.cc.getCompilationUnit(), (Tree)arg));
-                long start = this.cc.getTrees().getSourcePositions().getStartPosition(this.cc.getCompilationUnit(), t);
-                long end = this.cc.getTrees().getSourcePositions().getEndPosition(this.cc.getCompilationUnit(), t);
-                NewClassTree newClassTree = constructionOfAddedComponent = arg instanceof NewClassTree ? (NewClassTree)arg : null;
-                if (constructionOfAddedComponent == null) {
-                    HashSet assignedTos = new HashSet();
-                    AssignmentTracer tracer = new AssignmentTracer(this.cc, this.scan, argument);
-                    Tree argTree = this.cc.getTrees().getTree(argument);
-                    if (argTree == null) {
-                        System.err.println("ArgTree for " + argument + " null");
-                        continue;
-                    }
-                    argTree.accept(tracer, assignedTos);
-                    if (!assignedTos.isEmpty()) {
-                        if (assignedTos.size() > 1) {
-                            System.err.println("Multiple assignments to " + l + " - analysis will be bad");
-                        }
-                        constructionOfAddedComponent = (NewClassTree)assignedTos.iterator().next();
+            for (ExpressionTree exprTree : l) {
+                if (Utils.isWebMarkupContainer(cc.getTrees(), cc.getTypes(), cc.getCompilationUnit(), exprTree)) {
+                    boolean consumed = handleWebContainer(invocationTree, l, exprTree, typeCallOccursOn, typeOfTarget, target, thingAddIsCalledOn, invocations);
+                    if (consumed) {
+                        break;
                     }
                 }
-                NewClassTree constructionOfParentComponent = null;
-                if (thingAddIsCalledOn instanceof IdentifierTree) {
-                    HashSet assignedTos = new HashSet();
-                    Element el = this.cc.getTrees().getElement(TreePath.getPath(this.cc.getCompilationUnit(), (Tree)thingAddIsCalledOn));
-                    Tree newTree = this.cc.getTrees().getTree(el);
-                    AssignmentTracer tracer = new AssignmentTracer(this.cc, this.scan, el);
-                    newTree.accept(tracer, assignedTos);
-                    if (!assignedTos.isEmpty()) {
-                        if (assignedTos.size() > 1) {
-                            System.err.println("Multiple assignments to " + thingAddIsCalledOn + " - analysis will be bad");
-                        }
-                        constructionOfParentComponent = (NewClassTree)assignedTos.iterator().next();
-                    }
-                } else {
-                    System.err.println("no thing add is called on " + thingAddIsCalledOn + " for " + t);
-                }
-                if (constructionOfParentComponent == null) {
-                    ConstructionFinder finder = new ConstructionFinder(this.cc, typeOfTarget);
-                    HashSet constructions = new HashSet();
-                    this.scan.accept(finder, constructions);
-                    if (constructions.size() > 1) {
-                        System.err.println("More than one construction of a " + typeOfTarget + " - analysis may be bad");
-                    }
-                    if (!constructions.isEmpty()) {
-                        constructionOfParentComponent = (NewClassTree)constructions.iterator().next();
-                    }
-                }
-                Invocation inv = new Invocation(typeCallOccursOn, t, target, argument, constructionOfAddedComponent, constructionOfParentComponent, start, end);
-                invocations.add(inv);
-                break;
             }
         }
-        if (elemForMethodInvocation != null && (tree = this.cc.getTrees().getTree(elemForMethodInvocation)) != null && !tree.equals(t)) {
-            tree.accept(this, invocations);
+        if (elemForMethodInvocation != null) {
+            Tree tree = cc.getTrees().getTree(elemForMethodInvocation);
+            if (tree != null && !tree.equals(invocationTree)) {
+                tree.accept(this, invocations);
+            }
         }
-        Void result = (Void)super.visitMethodInvocation(t, invocations);
+        Void result = super.visitMethodInvocation(invocationTree, invocations);
         return result;
+    }
+
+    private boolean handleWebContainer(
+            MethodInvocationTree invocationTree,
+            List<? extends ExpressionTree> exprTreeList,
+            ExpressionTree exprTree,
+            TypeMirror typeCallOccursOn,
+            TypeMirror typeOfTarget,
+            Element target,
+            ExpressionTree thingAddIsCalledOn,
+            List<Invocation> invocations
+    ) {
+        Element argument = cc.getTrees().getElement(TreePath.getPath(cc.getCompilationUnit(), exprTree));
+        NewClassTree constructionOfAddedComponent = getConstructionOfAddedComponent(exprTreeList, exprTree, argument);
+        if (constructionOfAddedComponent != null) {
+            long start = cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), invocationTree);
+            long end = cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), invocationTree);
+            NewClassTree constructionOfParentComponent = getConstructionOfParentComponent(invocationTree, typeOfTarget, thingAddIsCalledOn);
+            Invocation inv = new Invocation(typeCallOccursOn, invocationTree, target, argument, constructionOfAddedComponent, constructionOfParentComponent, start, end);
+            invocations.add(inv);
+            return true;
+        }
+        return false;
+    }
+
+    private NewClassTree getConstructionOfAddedComponent(
+            List<? extends ExpressionTree> exprTreeList,
+            ExpressionTree exprTree,
+            Element argument
+    ) {
+        NewClassTree constructionOfAddedComponent = (exprTree instanceof NewClassTree) ? (NewClassTree)exprTree : null;
+        if (constructionOfAddedComponent == null) {
+            HashSet<NewClassTree> assignedTos = new HashSet<>();
+            AssignmentTracer tracer = new AssignmentTracer(cc, scan, argument);
+            Tree argTree = cc.getTrees().getTree(argument);
+            if (argTree == null) {
+                System.err.println("ArgTree for " + argument + " null");
+            } else {
+                argTree.accept(tracer, assignedTos);
+                if (!assignedTos.isEmpty()) {
+                    if (assignedTos.size() > 1) {
+                        System.err.println("Multiple assignments to " + exprTreeList + " - analysis will be bad");
+                    }
+                    constructionOfAddedComponent = assignedTos.iterator().next();
+                }
+            }
+        }
+        return constructionOfAddedComponent;
+    }
+
+    private NewClassTree getConstructionOfParentComponent(
+            MethodInvocationTree invocationTree,
+            TypeMirror typeOfTarget,
+            ExpressionTree thingAddIsCalledOn
+    ) {
+        NewClassTree constructionOfParentComponent = null;
+        if (thingAddIsCalledOn instanceof IdentifierTree) {
+            HashSet<NewClassTree> assignedTos = new HashSet<>();
+            Element el = cc.getTrees().getElement(TreePath.getPath(cc.getCompilationUnit(), thingAddIsCalledOn));
+            Tree newTree = cc.getTrees().getTree(el);
+            AssignmentTracer tracer = new AssignmentTracer(cc, scan, el);
+            newTree.accept(tracer, assignedTos);
+            if (!assignedTos.isEmpty()) {
+                if (assignedTos.size() > 1) {
+                    System.err.println("Multiple assignments to " + thingAddIsCalledOn + " - analysis will be bad");
+                }
+                constructionOfParentComponent = assignedTos.iterator().next();
+            }
+        } else {
+            System.err.println("no thing add is called on " + thingAddIsCalledOn + " for " + invocationTree);
+        }
+        if (constructionOfParentComponent == null) {
+            ConstructionFinder finder = new ConstructionFinder(cc, typeOfTarget);
+            HashSet<NewClassTree> constructions = new HashSet<>();
+            this.scan.accept(finder, constructions);
+            if (constructions.size() > 1) {
+                System.err.println("More than one construction of a " + typeOfTarget + " - analysis may be bad");
+            }
+            if (!constructions.isEmpty()) {
+                constructionOfParentComponent = constructions.iterator().next();
+            }
+        }
+        return constructionOfParentComponent;
     }
 }
