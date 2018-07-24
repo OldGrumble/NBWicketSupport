@@ -18,7 +18,7 @@ import javax.lang.model.element.Element;
 import org.netbeans.api.java.source.CompilationController;
 
 /**
- * 
+ *
  * @author Tim Boudreau
  */
 final class AssignmentTracer extends TreeScanner<Void, Set<NewClassTree>> {
@@ -43,12 +43,12 @@ final class AssignmentTracer extends TreeScanner<Void, Set<NewClassTree>> {
     }
 
     boolean isKnown(Element el) {
-        return el.equals(this.identifier) || this.parent != null && this.parent.isKnown(el);
+        return el.equals(identifier) || parent != null && parent.isKnown(el);
     }
 
     @Override
     public Void visitReturn(ReturnTree tree, Set<NewClassTree> set) {
-        if (this.tryFindReturnType > 0) {
+        if (tryFindReturnType > 0) {
             ExpressionTree ret = tree.getExpression();
             switch (ret.getKind()) {
                 case NEW_CLASS: {
@@ -56,18 +56,18 @@ final class AssignmentTracer extends TreeScanner<Void, Set<NewClassTree>> {
                     break;
                 }
                 case IDENTIFIER: {
-                    Element identified = this.cc.getTrees().getElement(TreePath.getPath(this.cc.getCompilationUnit(), (Tree)ret));
-                    if (this.isKnown(identified)) {
+                    Element identified = cc.getTrees().getElement(TreePath.getPath(cc.getCompilationUnit(), (Tree)ret));
+                    if (isKnown(identified)) {
                         break;
                     }
-                    Tree newTree = this.cc.getTrees().getTree(identified);
-                    AssignmentTracer at = new AssignmentTracer(this.cc, this.scan, identified);
+                    Tree newTree = cc.getTrees().getTree(identified);
+                    AssignmentTracer at = new AssignmentTracer(cc, scan, identified);
                     newTree.accept(at, set);
                     break;
                 }
                 case METHOD_INVOCATION: {
                     MethodInvocationTree inv = (MethodInvocationTree)ret;
-                    this.traceMethodInvocation(inv, set);
+                    traceMethodInvocation(inv, set);
                     break;
                 }
                 default: {
@@ -75,36 +75,33 @@ final class AssignmentTracer extends TreeScanner<Void, Set<NewClassTree>> {
                 }
             }
         }
-        return (Void)super.visitReturn(tree, set);
+        return super.visitReturn(tree, set);
     }
 
-    /*
-     * WARNING - Removed try catching itself - possible behaviour change.
-     */
     private void traceMethodInvocation(MethodInvocationTree mit, Set<NewClassTree> set) {
-        ++this.tryFindReturnType;
+        tryFindReturnType++;
         try {
             ExpressionTree select = mit.getMethodSelect();
-            Element el = this.cc.getTrees().getElement(TreePath.getPath(this.cc.getCompilationUnit(), (Tree)select));
-            Tree methodTree = this.cc.getTrees().getTree(el);
+            Element el = cc.getTrees().getElement(TreePath.getPath(cc.getCompilationUnit(), (Tree)select));
+            Tree methodTree = cc.getTrees().getTree(el);
             methodTree.accept(this, set);
-        } catch (StackOverflowError e) {
+        } catch (StackOverflowError ex) {
             System.err.println("Recursion or cicular call encountered from " + mit);
         } finally {
-            --this.tryFindReturnType;
+            tryFindReturnType--;
         }
     }
 
     @Override
     public Void visitVariable(VariableTree tree, Set<NewClassTree> set) {
-        if (!this.identifier.getSimpleName().equals(tree.getName())) {
+        if (!identifier.getSimpleName().equals(tree.getName())) {
             return null;
         }
         ExpressionTree ect = tree.getInitializer();
         if (ect != null) {
             switch (ect.getKind()) {
                 case METHOD_INVOCATION: {
-                    this.traceMethodInvocation((MethodInvocationTree)ect, set);
+                    traceMethodInvocation((MethodInvocationTree)ect, set);
                     break;
                 }
                 case NEW_CLASS: {
@@ -112,18 +109,18 @@ final class AssignmentTracer extends TreeScanner<Void, Set<NewClassTree>> {
                     break;
                 }
                 case IDENTIFIER: {
-                    IdentifierTree id = (IdentifierTree)ect;
-                    Element nue = this.cc.getTrees().getElement(TreePath.getPath(this.cc.getCompilationUnit(), (Tree)ect));
+//                    IdentifierTree id = (IdentifierTree)ect;
+                    Element nue = cc.getTrees().getElement(TreePath.getPath(cc.getCompilationUnit(), ect));
                     if (this.isKnown(nue)) {
                         break;
                     }
-                    Tree newTree = this.cc.getTrees().getTree(nue);
-                    AssignmentTracer newTracer = new AssignmentTracer(this.cc, this.scan, nue, this);
+                    Tree newTree = cc.getTrees().getTree(nue);
+                    AssignmentTracer newTracer = new AssignmentTracer(cc, scan, nue, this);
                     newTree.accept(newTracer, set);
                 }
             }
         }
-        return (Void)super.visitVariable(tree, set);
+        return super.visitVariable(tree, set);
     }
 
     @Override
@@ -131,20 +128,20 @@ final class AssignmentTracer extends TreeScanner<Void, Set<NewClassTree>> {
         Element varEl;
         ExpressionTree var = tree.getVariable();
         try {
-            varEl = this.cc.getTrees().getElement(TreePath.getPath(this.cc.getCompilationUnit(), (Tree)var));
+            varEl = cc.getTrees().getElement(TreePath.getPath(cc.getCompilationUnit(), (Tree)var));
         } catch (NullPointerException npe) {
             return null;
         }
-        if (this.identifier.equals(varEl)) {
+        if (identifier.equals(varEl)) {
             ExpressionTree to = tree.getExpression();
             if (to instanceof NewClassTree) {
                 set.add((NewClassTree)to);
             } else if (to instanceof IdentifierTree) {
                 try {
-                    Element nue = this.cc.getTrees().getElement(TreePath.getPath(this.cc.getCompilationUnit(), (Tree)to));
+                    Element nue = cc.getTrees().getElement(TreePath.getPath(cc.getCompilationUnit(), (Tree)to));
                     if (!this.isKnown(nue)) {
-                        Tree newTree = this.cc.getTrees().getTree(nue);
-                        AssignmentTracer newTracer = new AssignmentTracer(this.cc, this.scan, this.identifier, this);
+                        Tree newTree = cc.getTrees().getTree(nue);
+                        AssignmentTracer newTracer = new AssignmentTracer(cc, scan, identifier, this);
                         newTree.accept(newTracer, set);
                     }
                 } catch (NullPointerException e) {
@@ -152,6 +149,6 @@ final class AssignmentTracer extends TreeScanner<Void, Set<NewClassTree>> {
                 }
             }
         }
-        return (Void)super.visitAssignment(tree, set);
+        return super.visitAssignment(tree, set);
     }
 }

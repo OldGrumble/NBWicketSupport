@@ -41,6 +41,51 @@ public final class MarkupContainerTree<T> {
         return result;
     }
 
+    public TreeModel toTreeModel() {
+        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(this.getRoot());
+        DefaultTreeModel mdl = new DefaultTreeModel(rootNode);
+        mdl.setRoot(rootNode);
+        this.addChildren(this.getRoot(), rootNode);
+        return mdl;
+    }
+
+    void add(Node<T> n) {
+        this.root.add(n);
+    }
+
+    public List<Node<T>> getNodes() {
+        return this.root.getChildren();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder b = new StringBuilder(super.toString());
+        b.append('\n');
+        this.convertToString(this.root, 0, b);
+        return b.toString();
+    }
+
+    Node<T> findNode(String id) {
+        if (id.equals(this.root.getId())) {
+            return this.root;
+        }
+        return this.findNode(id, this.root);
+    }
+
+    Node<T> findNode(String id, Node<T> parent) {
+        for (Node<T> n : parent.getChildren()) {
+            if (id.equals(n.getId())) {
+                return n;
+            }
+            Node<T> result = this.findNode(id, n);
+            if (result == null) {
+                continue;
+            }
+            return result;
+        }
+        return null;
+    }
+
     private static <T> void merge(Node<T> a, Node<T> b, Node<T> parent) {
         String id;
         assert (a.getId().equals(b.getId()));
@@ -69,14 +114,6 @@ public final class MarkupContainerTree<T> {
         }
     }
 
-    public TreeModel toTreeModel() {
-        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(this.getRoot());
-        DefaultTreeModel mdl = new DefaultTreeModel(rootNode);
-        mdl.setRoot(rootNode);
-        this.addChildren(this.getRoot(), rootNode);
-        return mdl;
-    }
-
     private void addChildren(Node<T> root, DefaultMutableTreeNode nd) {
         ArrayList<Node<T>> l = new ArrayList<>(root.getChildren());
         Collections.sort(l);
@@ -87,51 +124,14 @@ public final class MarkupContainerTree<T> {
         }
     }
 
-    public List<Node<T>> getNodes() {
-        return this.root.getChildren();
-    }
-
-    void add(Node<T> n) {
-        this.root.add(n);
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder b = new StringBuilder(super.toString());
-        b.append('\n');
-        this.outNode(this.root, 0, b);
-        return b.toString();
-    }
-
-    private void outNode(NodeImpl<T> n, int depth, StringBuilder b) {
+    private void convertToString(NodeImpl<T> n, int depth, StringBuilder b) {
         char[] c = new char[depth * 3];
         Arrays.fill(c, ' ');
         b.append(c);
         b.append(n.getId()).append(" (").append(n.getData()).append(")");
         b.append('\n');
         for (Node<T> nn : n.getChildren()) {
-            this.outNode((NodeImpl)nn, depth + 1, b);
+            this.convertToString((NodeImpl)nn, depth + 1, b);
         }
-    }
-
-    Node<T> findNode(String id) {
-        if (id.equals(this.root.getId())) {
-            return this.root;
-        }
-        return this.findNode(id, this.root);
-    }
-
-    Node<T> findNode(String id, Node<T> parent) {
-        for (Node<T> n : parent.getChildren()) {
-            if (id.equals(n.getId())) {
-                return n;
-            }
-            Node<T> result = this.findNode(id, n);
-            if (result == null) {
-                continue;
-            }
-            return result;
-        }
-        return null;
     }
 }

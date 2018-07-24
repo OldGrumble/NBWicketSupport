@@ -66,10 +66,12 @@ public final class Invocation implements Comparable<Invocation> {
         return this.target;
     }
 
+    @Override
     public String toString() {
         return this.invocation + " target is " + this.target + " arg is " + this.argument + " src is " + this.src + " occurs in type " + this.occursIn;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -99,12 +101,10 @@ public final class Invocation implements Comparable<Invocation> {
         if (this.start != other.start) {
             return false;
         }
-        if (!(this.occursIn == other.occursIn || this.occursIn != null && this.occursIn.equals(other.occursIn))) {
-            return false;
-        }
-        return true;
+        return this.occursIn == other.occursIn || this.occursIn != null && this.occursIn.equals(other.occursIn);
     }
 
+    @Override
     public int hashCode() {
         int hash = 3;
         hash = 59 * hash + (this.invocation != null ? this.invocation.hashCode() : 0);

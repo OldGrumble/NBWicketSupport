@@ -30,15 +30,14 @@ public class ComponentConstructorInvocationFinder extends TreeScanner<Void, Set<
     }
 
     @Override
-    public Void visitNewClass(NewClassTree t, Set<NewClassTree> coll) {
-        // cc.getTrees()
-        TypeMirror mirror = cc.getTrees().getTypeMirror(TreePath.getPath(cc.getCompilationUnit(), (Tree)t));
+    public Void visitNewClass(NewClassTree tree, Set<NewClassTree> coll) {
+        TypeMirror mirror = cc.getTrees().getTypeMirror(TreePath.getPath(cc.getCompilationUnit(), tree));
         if (mirror != null) {
             boolean isWMC = Utils.isWebMarkupContainer(mirror, cc.getTypes());
             if (isWMC) {
-                coll.add(t);
+                coll.add(tree);
             }
-            return (Void)super.visitNewClass(t, coll);
+            return (Void)super.visitNewClass(tree, coll);
         } else {
             return null;
         }

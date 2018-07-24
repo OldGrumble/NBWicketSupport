@@ -3,6 +3,7 @@
  */
 package org.netbeans.modules.web.wicket.tree.finders;
 
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MemberSelectTree;
@@ -41,7 +42,7 @@ public final class AddToMarkupContainerFinder extends TreeScanner<Void, List<Inv
 
     private final Tree scan;
 
-    public AddToMarkupContainerFinder(CompilationController cc, Tree scan) {
+    public AddToMarkupContainerFinder(CompilationController cc, ClassTree scan) {
         this.cc = cc;
         this.scan = scan;
     }

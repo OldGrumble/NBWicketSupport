@@ -32,7 +32,6 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 import javax.swing.ListModel;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;

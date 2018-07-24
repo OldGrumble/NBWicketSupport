@@ -18,11 +18,57 @@
  */
 package org.netbeans.modules.web.wicket.tree.results;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.TreeSet;
 
 /**
  *
  * @author Peter Nabbefeld
  */
-public interface CollectingResultHandler<T extends Collection> extends TreeScanResultHandler<T> {
+public class CollectingResultHandler<T, C extends Collection<T>> implements TreeScanResultHandler<T> {
+
+    private final Class<C> clazz;
+    private final C resultCollection;
+
+    public CollectingResultHandler(Class<C> clazz) {
+        this.clazz = clazz;
+        resultCollection = createCollectionImpl(clazz);
+    }
+
+    public CollectingResultHandler(Collection<T> collection) {
+        this.clazz = (Class<C>)collection.getClass();
+        resultCollection = (C)collection;
+    }
+
+    /**
+     * Add some intermediary result to the collection.
+     *
+     * @param result The intermediary result.
+     */
+    @Override
+    public void handleResult(T result) {
+        resultCollection.add(result);
+    }
+
+    /**
+     * Get the result collection.
+     *
+     * @return The result collection.
+     */
+    public C getResult() {
+        return clazz.cast(Collections.unmodifiableCollection(resultCollection));
+    }
+
+    private C createCollectionImpl(Class<C> clazz) {
+        switch (clazz.getName()) {
+            case "java.util.List":
+                return clazz.cast(new ArrayList<>());
+            case "java.util.Set":
+                return clazz.cast(new TreeSet<>());
+            default:
+                throw new IllegalArgumentException("The collection type " + clazz.getName() + " is not supported");
+        }
+    }
 }

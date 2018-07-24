@@ -5,19 +5,14 @@ package org.netbeans.modules.web.wicket.tree;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.NewClassTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
 import javax.swing.text.Document;
 import org.netbeans.api.java.source.CompilationController;
 import org.netbeans.api.java.source.JavaSource;
@@ -28,7 +23,9 @@ import org.netbeans.modules.web.wicket.tree.finders.ComponentIdFinder;
 import org.netbeans.modules.web.wicket.tree.util.Invocation;
 import org.netbeans.modules.web.wicket.tree.util.ProblemFinderVisitor;
 import org.netbeans.modules.web.wicket.tree.finders.TreeCallback;
-import org.netbeans.modules.web.wicket.tree.util.Utils;
+import org.netbeans.modules.web.wicket.tree.results.CollectingResultHandler;
+import org.netbeans.modules.web.wicket.tree.scan.ComponentIdScanner;
+import org.netbeans.modules.web.wicket.tree.util.WicketCompilationUtils;
 import org.netbeans.modules.web.wicket.util.StringUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
@@ -40,6 +37,14 @@ import org.openide.util.Exceptions;
  * @author Tim Boudreau
  */
 public final class JavaTreeBuilder {
+
+    public static enum ScannerUsage {
+
+        CLASSIC_FINDER,
+        REFACTORED_SCANNER;
+    }
+
+    public static final ScannerUsage SCANNER_USAGE = ScannerUsage.CLASSIC_FINDER;
 
     private final FileObject file;
     private final Document doc;
@@ -91,9 +96,9 @@ public final class JavaTreeBuilder {
         try {
             JavaSource src = this.file == null ? JavaSource.forDocument((Document)this.doc) : JavaSource.forFileObject((FileObject)this.file);
             if (immediate) {
-                src.runUserActionTask((Task)new TreeWalker(treeCallback, visitors), true);
+                src.runUserActionTask(new JavaTreeWalker(treeCallback, visitors), true);
             } else {
-                src.runWhenScanFinished((Task)new TreeWalker(treeCallback, visitors), true);
+                src.runWhenScanFinished(new JavaTreeWalker(treeCallback, visitors), true);
             }
         } catch (IOException ex) {
             Exceptions.printStackTrace((Throwable)ex);
@@ -101,117 +106,151 @@ public final class JavaTreeBuilder {
     }
 
     public Collection<? extends ProblemFinderVisitor.Problem> getProblems() {
-        return this.problems == null ? Collections.emptySet() : this.problems;
+        return problems == null ? Collections.emptySet() : problems;
     }
 
-    private final class TreeWalker implements Task<CompilationController> {
+    private final class JavaTreeWalker implements Task<CompilationController> {
 
         private final TreeCallback callback;
         private final Collection<ProblemFinderVisitor> visitors;
 
-        TreeWalker(TreeCallback t, Collection<ProblemFinderVisitor> visitors) {
-            this.callback = t;
+        JavaTreeWalker(TreeCallback callback, Collection<ProblemFinderVisitor> visitors) {
+            this.callback = callback;
             this.visitors = visitors == null ? Collections.emptySet() : visitors;
             JavaTreeBuilder.this.problems = visitors == null ? null : new HashSet();
         }
 
         @Override
         public void run(CompilationController cc) throws Exception {
-            cc.toPhase(JavaSource.Phase.RESOLVED);
-            TypeElement markupContainerType = cc.getElements().getTypeElement("org.apache.wicket.MarkupContainer");
-            if (markupContainerType == null) {
-                System.err.println("Wicket not found on classpath");
+            // Check Wicket available
+            if (!WicketCompilationUtils.isWicketOnClasspath(cc)) {
                 return;
             }
-            ArrayList<? extends Tree> types = new ArrayList<>(cc.getCompilationUnit().getTypeDecls());
-            Iterator<? extends Tree> it = types.iterator();
-            while (it.hasNext()) {
-                Tree tree = it.next();
-                TypeMirror mirror = cc.getTrees().getTypeMirror(TreePath.getPath(cc.getCompilationUnit(), tree));
-                if (!(tree instanceof ClassTree) || !Utils.isWebMarkupContainer(mirror, cc.getTypes())) {
-                    it.remove();
-                }
-            }
+            // Get class trees (usually one)
+            List<ClassTree> types = WicketCompilationUtils.getClassTrees(cc);
+            // Initialize analyzer maps
             HashMap<String, Node<String>> nodes = new HashMap<>();
             MarkupContainerTree<String> result = null;
-            HashMap invocations = new HashMap();
-            HashMap types2ids = new HashMap();
-            for (Tree tree : types) {
+            HashMap<ClassTree, LinkedList<Invocation>> invocations = new HashMap<>();
+            HashMap<ClassTree, HashMap<NewClassTree, List<String>>> types2ids = new HashMap<>();
+            // Process all class trees
+            for (ClassTree tree : types) {
                 if (result == null) {
                     result = new MarkupContainerTree<>();
                 }
-                if (!this.visitors.isEmpty()) {
-                    for (ProblemFinderVisitor v : this.visitors) {
+                // <editor-fold defaultstate="collapsed" desc="visitors handling (unused)">                          
+                if (!visitors.isEmpty()) {
+                    for (ProblemFinderVisitor v : visitors) {
                         try {
-                            v.visitWicketMarkupContainer((ClassTree)tree, cc, cc.getFileObject(), JavaTreeBuilder.this.problems);
-                        } catch (Exception e) {
-                            Exceptions.printStackTrace((Throwable)e);
+                            v.visitWicketMarkupContainer(tree, cc, cc.getFileObject(), JavaTreeBuilder.this.problems);
+                        } catch (Exception ex) {
+                            Exceptions.printStackTrace(ex);
                         }
                     }
-                }
-                LinkedList<Invocation> invs = new LinkedList();
-                invocations.put(tree, invs);
-                AddToMarkupContainerFinder addFinder = new AddToMarkupContainerFinder(cc, tree);
-                tree.accept(addFinder, invs);
+                }// </editor-fold>
                 ComponentConstructorInvocationFinder createFinder = new ComponentConstructorInvocationFinder(cc);
                 HashSet<NewClassTree> constructorInvocations = new HashSet();
                 tree.accept(createFinder, constructorInvocations);
-                HashMap invs2ids = new HashMap();
+
+                LinkedList<Invocation> invs = new LinkedList();
+                invocations.put(tree, invs);
+
+                AddToMarkupContainerFinder addFinder = new AddToMarkupContainerFinder(cc, tree);
+                tree.accept(addFinder, invs);
+
+                HashMap<NewClassTree, List<String>> invs2ids = new HashMap();
                 types2ids.put(tree, invs2ids);
-                ComponentIdFinder idFinder = new ComponentIdFinder(cc);
-                constructorInvocations.forEach((invocation) -> {
-                    ArrayList ids = new ArrayList(1);
-                    invs2ids.put(invocation, ids);
-                    invocation.accept(idFinder, ids);
-                    if (!(this.visitors.isEmpty())) {
-                        for (ProblemFinderVisitor v : this.visitors) {
-                            try {
-                                v.visitWicketComponentConstruction(invocation, cc, cc.getFileObject(), ids, JavaTreeBuilder.this.problems);
-                            } catch (Exception e) {
-                                Exceptions.printStackTrace((Throwable)e);
-                            }
-                        }
+
+                // Get every Id found per constructor invocation.
+                switch (SCANNER_USAGE) {
+                    case CLASSIC_FINDER: {
+                        ComponentIdFinder idFinder = new ComponentIdFinder(cc);
+                        constructorInvocations.forEach((invocation) -> {
+                            List<String> ids = new ArrayList<>(1);
+                            invs2ids.put(invocation, ids);
+                            invocation.accept(idFinder, ids);
+                            // <editor-fold defaultstate="collapsed" desc="visitors handling (unused)">                          
+                            if (!(visitors.isEmpty())) {
+                                for (ProblemFinderVisitor v : visitors) {
+                                    try {
+                                        v.visitWicketComponentConstruction(invocation, cc, cc.getFileObject(), ids, JavaTreeBuilder.this.problems);
+                                    } catch (Exception ex) {
+                                        Exceptions.printStackTrace(ex);
+                                    }
+                                }
+                            }// </editor-fold>
+                        });
+                        break;
                     }
-                });
+                    case REFACTORED_SCANNER: {
+                        List<String> ids = new ArrayList<>(1);
+                        CollectingResultHandler<String, List<String>> constructorHandler = (CollectingResultHandler<String, List<String>>)new CollectingResultHandler(ids);
+                        ComponentIdScanner idScanner = new ComponentIdScanner(cc);
+                        constructorInvocations.forEach((invocation) -> {
+                            invocation.accept(idScanner, constructorHandler);
+                            // <editor-fold defaultstate="collapsed" desc="visitors handling (unused)">                          
+                            if (!visitors.isEmpty()) {
+                                for (ProblemFinderVisitor v : visitors) {
+                                    try {
+                                        v.visitWicketComponentConstruction(invocation, cc, cc.getFileObject(), ids, JavaTreeBuilder.this.problems);
+                                    } catch (Exception ex) {
+                                        Exceptions.printStackTrace(ex);
+                                    }
+                                }
+                            }// </editor-fold>
+                            invs2ids.put(invocation, new ArrayList<>(ids));
+                            ids.clear();
+                        });
+                        break;
+                    }
+                    default:
+                        throw new AssertionError();
+                }
+
+                // Sort added components (found by AddToMarkupContainerFinder)
                 Collections.sort(invs);
+                // Guess: For every invocation of "add" search a "new" contained
+                // like "add(new Label("theId"))"
+                // This will not find "x = new Label("theId"); add(x);"
                 for (Invocation inv : invs) {
-                    if (!this.visitors.isEmpty()) {
-                        for (ProblemFinderVisitor v : this.visitors) {
+                    // <editor-fold defaultstate="collapsed" desc="visitors handling (unused)">                          
+                    if (!visitors.isEmpty()) {
+                        for (ProblemFinderVisitor v : visitors) {
                             try {
                                 v.visitWicketAddInvocation(inv, cc, cc.getFileObject(), JavaTreeBuilder.this.problems);
-                            } catch (Exception e) {
-                                Exceptions.printStackTrace((Throwable)e);
+                            } catch (Exception ex) {
+                                Exceptions.printStackTrace(ex);
                             }
                         }
-                    }
+                    }// </editor-fold>
                     NewClassTree parent = inv.getParent();
                     NewClassTree child = inv.getSrc();
-                    List parentIds = parent == null ? null : (List)invs2ids.get(parent);
-                    List childIds = child == null ? Collections.singletonList("?") : (List)invs2ids.get(child);
-                    String cid = childIds == null || childIds.isEmpty() ? "Unknown id" : StringUtils.unquote((String)childIds.get(0));
-                    String pid = parentIds == null || parentIds.isEmpty() ? null : StringUtils.unquote((String)parentIds.get(0));
+                    List<String> parentIds = parent == null ? null : invs2ids.get(parent);
+                    List<String> childIds = child == null ? Collections.singletonList("?") : invs2ids.get(child);
+                    String cid = childIds == null || childIds.isEmpty() ? "Unknown id" : StringUtils.unquote(childIds.get(0));
+                    String pid = parentIds == null || parentIds.isEmpty() ? null : StringUtils.unquote(parentIds.get(0));
                     System.err.println(childIds + " added to " + parentIds);
                     System.err.println(inv.getArgument() + " added to " + inv.getTarget());
                     Node<String> n = new NodeImpl<>(cid, null, (int)inv.getStart(), cid);
                     nodes.put(cid, n);
                     if (pid != null) {
-                        Node<String> parNode = (Node<String>)nodes.get(pid);
+                        Node<String> parNode = nodes.get(pid);
                         if (parNode == null) {
                             parNode = new NodeImpl<>(pid, null, (int)inv.getStart(), cid);
                             nodes.put(pid, parNode);
                         }
-                        ((NodeImpl)parNode).add(n);
+                        ((NodeImpl<String>)parNode).add(n);
                     }
                 }
-                for (Node node : nodes.values()) {
-                    if (((NodeImpl)node).getParent() != null) {
-                        continue;
+                for (Node<String> node : nodes.values()) {
+                    if (((NodeImpl<String>)node).getParent() == null) {
+                        result.add(node);
                     }
-                    result.add(node);
                 }
             }
-            if (this.callback != null) {
-                this.callback.setTree(result);
+            System.out.println("result = " + result);
+            if (callback != null) {
+                callback.setTree(result);
             }
         }
     }

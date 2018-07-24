@@ -3,6 +3,7 @@
  */
 package org.netbeans.modules.web.wicket.tree.finders;
 
+import org.netbeans.modules.web.wicket.tree.scan.ConstructorScanner;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
@@ -14,7 +15,6 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreeScanner;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +22,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.java.source.CompilationController;
+import org.netbeans.modules.web.wicket.tree.results.CollectingResultHandler;
 
 /**
  *
@@ -38,11 +39,11 @@ public class ComponentIdFinder extends TreeScanner<Void, List<String>> {
     }
 
     /**
-     * Accept
+     * Accept constructor calls.
      *
-     * @param tree
-     * @param s
-     * @return
+     * @param tree Tree
+     * @param s Collection of Ids
+     * @return nothing
      */
     @Override
     public Void visitNewClass(NewClassTree tree, List<String> s) {
@@ -54,8 +55,10 @@ public class ComponentIdFinder extends TreeScanner<Void, List<String>> {
             if (el != null) {
                 System.err.println("Super element is " + el.getQualifiedName());
                 ClassTree cTree = cc.getTrees().getTree(el);
-                Set<MethodTree> constructors = new HashSet();
-                cTree.accept(new ConstructorFinder(), constructors);
+
+                CollectingResultHandler<MethodTree, Set<MethodTree>> resultHandler = (CollectingResultHandler<MethodTree, Set<MethodTree>>)new CollectingResultHandler(Set.class);
+                cTree.accept(new ConstructorScanner(cc), resultHandler);
+                Set<MethodTree> constructors = resultHandler.getResult();
 
                 this.searchingConstructor = true;
                 try {
@@ -78,8 +81,7 @@ public class ComponentIdFinder extends TreeScanner<Void, List<String>> {
 
     @Override
     public Void visitMethodInvocation(MethodInvocationTree tree, List<String> names) {
-        boolean isSuper;
-        if (this.searchingConstructor && (isSuper = this.isSuperCallInConstructor(tree))) {
+        if (this.searchingConstructor && this.isSuperCallInConstructor(tree)) {
             List<? extends ExpressionTree> l = tree.getArguments();
             this.scanInArgs(l, names);
         }

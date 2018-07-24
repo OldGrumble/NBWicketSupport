@@ -61,7 +61,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 
 /**
- * 
+ *
  * @author Tim Boudreau
  */
 public final class Utils {
@@ -552,27 +552,34 @@ public final class Utils {
         return Utils.isWebMarkupContainer(mirror, types);
     }
 
+    /**
+     * Test if the given TypeMirror or any of its super types found in given
+     * Types is org.apache.wicket.Component.
+     *
+     * @param mirror The given TypeMirror.1
+     * @param types The given Types, usually all found in the CompilationUnit.
+     * @return True, if any class in the CompilationUnit extends
+     * org.apache.wicket.Component.
+     */
     public static boolean isWebMarkupContainer(TypeMirror mirror, Types types) {
-        boolean result;
-        block1:
-        {
-            result = false;
-            if (mirror == null || "java.lang.Object".equals(mirror.toString()) || (result |= "org.apache.wicket.Component".equals(mirror.toString()))) {
-                break block1;
-            }
-            List<? extends TypeMirror> l = types.directSupertypes(mirror);
-            for (TypeMirror tm : l) {
-                if (result |= Utils.isWebMarkupContainer(tm, types)) {
-                    break;
+        boolean result = false;
+        if (mirror != null && !"java.lang.Object".equals(mirror.toString())) {
+            result |= "org.apache.wicket.Component".equals(mirror.toString());
+            if (!result) {
+                List<? extends TypeMirror> l = types.directSupertypes(mirror);
+                for (TypeMirror tm : l) {
+                    if (result |= isWebMarkupContainer(tm, types)) {
+                        break;
+                    }
                 }
             }
         }
         return result;
     }
 
-    static boolean isRepeater(Trees trees, Types types, CompilationUnitTree unit, Tree t) {
-        TypeMirror mirror = trees.getTypeMirror(TreePath.getPath(unit, t));
-        return Utils.isWebMarkupContainer(mirror, types);
+    static boolean isRepeater(Trees trees, Types types, CompilationUnitTree unit, Tree tree) {
+        TypeMirror mirror = trees.getTypeMirror(TreePath.getPath(unit, tree));
+        return isWebMarkupContainer(mirror, types);
     }
 
     static boolean isRepeater(TypeMirror mirror, Types types) {
